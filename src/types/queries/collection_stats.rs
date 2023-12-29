@@ -1,11 +1,6 @@
 use graphql_client::GraphQLQuery;
-use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
-struct Decimal(String);
-
-#[derive(Debug, Deserialize)]
-struct Timestamp(i64);
+use crate::types::queries::general::{Decimal, Timestamp};
 
 #[derive(GraphQLQuery)]
 #[graphql(

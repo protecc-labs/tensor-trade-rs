@@ -2,7 +2,7 @@ use anyhow::Result;
 
 extern crate tensor_trade_rs;
 
-use tensor_trade_rs::TensorTradeGetters;
+use tensor_trade_rs::TensorTrade;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -15,7 +15,11 @@ async fn main() -> Result<()> {
     // client
     //     .get_collection_stats("rfijruifrnufnre".to_string())
     //     .await;
-    client.get_collection_stats("tensorians".to_string()).await;
+    // client.get_collection_stats("tensorians".to_string()).await;
+
+    client
+        .get_active_orders("duckpunkzuniverse".to_string())
+        .await?;
 
     Ok(())
 }

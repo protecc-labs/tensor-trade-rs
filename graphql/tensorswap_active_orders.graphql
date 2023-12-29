@@ -1,0 +1,25 @@
+query TensorSwapActiveOrders($slug: String!) {
+  tswapOrders(slug: $slug) {
+    address
+    createdUnix
+    curveType
+    delta
+    mmFeeBps
+    nftsForSale {
+      onchainId
+    }
+    nftsHeld
+    ownerAddress
+    poolType
+    solBalance
+    startingPrice
+    buyNowPrice
+    sellNowPrice
+    statsAccumulatedMmProfit
+    statsTakerBuyCount
+    statsTakerSellCount
+    takerBuyCount
+    takerSellCount
+    updatedAt
+  }
+}

@@ -15,11 +15,18 @@ async fn main() -> Result<()> {
     // client
     //     .get_collection_stats("rfijruifrnufnre".to_string())
     //     .await;
+
     // client.get_collection_stats("tensorians".to_string()).await;
 
-    client
-        .get_active_orders("duckpunkzuniverse".to_string())
-        .await?;
+    // client
+    //     .get_active_orders("duckpunkzuniverse".to_string())
+    //     .await?;
+
+    dbg!(
+        client
+            .get_tcomp_bids("duckpunkzuniverse".to_string())
+            .await?
+    );
 
     Ok(())
 }

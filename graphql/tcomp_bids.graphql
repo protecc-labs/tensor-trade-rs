@@ -1,0 +1,17 @@
+query TcompBids($slug: String!) {
+  tcompBids(slug: $slug) {
+    address
+    amount
+    createdAt
+    field
+    fieldId
+    filledQuantity
+    margin
+    marginNr
+    ownerAddress
+    quantity
+    solBalance
+    target
+    targetId
+  }
+}

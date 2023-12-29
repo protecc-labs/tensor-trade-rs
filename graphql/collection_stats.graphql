@@ -1,0 +1,30 @@
+query CollectionStats($slug: String!) {
+  instrumentTV2(slug: $slug) {
+    id
+    slug
+    slugMe
+    slugDisplay
+    statsV2 {
+      currency
+      buyNowPrice
+      buyNowPriceNetFees
+      sellNowPrice
+      sellNowPriceNetFees
+      numListed
+      numMints
+      floor1h
+      floor24h
+      floor7d
+      sales1h
+      sales24h
+      sales7d
+      salesAll
+      volume1h
+      volume24h
+      volume7d
+      volumeAll
+    }
+    firstListDate
+    name
+  }
+}

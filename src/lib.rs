@@ -74,7 +74,10 @@ pub trait TensorTrade {
         slug: String,
     ) -> Result<Vec<TensorSwapActiveOrdersTswapOrders>, anyhow::Error>;
 
-    async fn get_tcomp_bids(&self, slug: String) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error>;
+    async fn get_tcomp_active_bids(
+        &self,
+        slug: String,
+    ) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error>;
 
     async fn get_token_mints_slugs(
         &self,
@@ -159,7 +162,10 @@ impl TensorTrade for TensorTradeClient {
         }
     }
 
-    async fn get_tcomp_bids(&self, slug: String) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error> {
+    async fn get_tcomp_active_bids(
+        &self,
+        slug: String,
+    ) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error> {
         let query = TcompBidsQuery::build_query(tcomp_bids_query::Variables { slug: slug.clone() });
 
         let response = self

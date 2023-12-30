@@ -12,6 +12,10 @@ use types::{
             collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
             CollectionStats as CollectionStatsQuery,
         },
+        mints::{
+            mints::{self as mints_query, MintsMints},
+            Mints as MintsQuery,
+        },
         tcomp_bids::{
             tcomp_bids::{self as tcomp_bids_query, TcompBidsTcompBids},
             TcompBids as TcompBidsQuery,
@@ -71,6 +75,11 @@ pub trait TensorTrade {
     ) -> Result<Vec<TensorSwapActiveOrdersTswapOrders>, anyhow::Error>;
 
     async fn get_tcomp_bids(&self, slug: String) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error>;
+
+    async fn get_mints_slugs(
+        &self,
+        token_mints: Vec<String>,
+    ) -> Result<Vec<MintsMints>, anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -168,6 +177,33 @@ impl TensorTrade for TensorTradeClient {
             // TODO: Warn user if `data.tcomp_bids` is empty.
             // TODO: This endpoint also returns all the trait bids for both compressed and non-compressed NFTs.
             // Any bid that has a non-empty attributes array is a trait bid.
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_mints_slugs(
+        &self,
+        token_mints: Vec<String>,
+    ) -> Result<Vec<MintsMints>, anyhow::Error> {
+        let query = MintsQuery::build_query(mints_query::Variables {
+            token_mints: token_mints.clone(),
+        });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<mints_query::ResponseData> = response.json().await?;
+
+        if let Some(data) = response_body.data {
+            Ok(data.mints)
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

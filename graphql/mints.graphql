@@ -1,0 +1,5 @@
+query Mints($tokenMints: [String!]!) {
+  mints(tokenMints: $tokenMints) {
+    slug
+  }
+}

@@ -22,9 +22,17 @@ async fn main() -> Result<()> {
     //     .get_active_orders("duckpunkzuniverse".to_string())
     //     .await?;
 
+    // dbg!(
+    //     client
+    //         .get_tcomp_bids("duckpunkzuniverse".to_string())
+    //         .await?
+    // );
+
     dbg!(
         client
-            .get_tcomp_bids("duckpunkzuniverse".to_string())
+            .get_mints_slugs(vec![
+                "8h5qaBJxgaDYkt8GKbDtDGUDNbQCWyW5SFCCEnLK76Fe".to_string()
+            ])
             .await?
     );
 

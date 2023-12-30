@@ -6,28 +6,29 @@ mod constants;
 mod types;
 
 use constants::TENSOR_TRADE_API_URL;
-use types::{
-    queries::{
-        collection_stats::{
-            collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
-            CollectionStats as CollectionStatsQuery,
-        },
-        mints::{
-            mints::{self as mints_query, MintsMints},
-            Mints as MintsQuery,
-        },
-        tcomp_bids::{
-            tcomp_bids::{self as tcomp_bids_query, TcompBidsTcompBids},
-            TcompBids as TcompBidsQuery,
-        },
-        tensorswap_active_orders::{
-            tensor_swap_active_orders::{
-                self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
-            },
-            TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
-        },
+use types::queries::{
+    collection_stats::{
+        collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
+        CollectionStats as CollectionStatsQuery,
     },
-    responses::collection_stats::CollectionStats,
+    mint_list::{
+        mint_list::{self as mint_list_query},
+        MintList as MintListQuery,
+    },
+    mints::{
+        mints::{self as mints_query, MintsMints},
+        Mints as MintsQuery,
+    },
+    tcomp_bids::{
+        tcomp_bids::{self as tcomp_bids_query, TcompBidsTcompBids},
+        TcompBids as TcompBidsQuery,
+    },
+    tensorswap_active_orders::{
+        tensor_swap_active_orders::{
+            self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
+        },
+        TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
+    },
 };
 
 #[derive(Debug, Clone)]
@@ -83,6 +84,23 @@ pub trait TensorTrade {
         &self,
         token_mints: Vec<String>,
     ) -> Result<Vec<MintsMints>, anyhow::Error>;
+
+    // ### Get Mint Active Listings, Bids AND/OR Active Orders
+    // async fn get_token_mint_active_listings(&self, token_mint: String);
+
+    // async fn get_token_mint_active_bids(&self, token_mint: String);
+
+    // async fn get_token_mint_active_orders(&self, token_mint: String);
+
+    // query MintList($slug: String!, $limit: Int, $after: String) {
+    //     mintList(slug: $slug, limit: $limit, after: $after)
+    //   }
+    async fn get_mint_list(
+        &self,
+        slug: String,
+        limit: Option<i64>,
+        after: Option<String>,
+    ) -> Result<Vec<String>, anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -210,6 +228,37 @@ impl TensorTrade for TensorTradeClient {
 
         if let Some(data) = response_body.data {
             Ok(data.mints)
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_mint_list(
+        &self,
+        slug: String,
+        limit: Option<i64>,
+        after: Option<String>,
+    ) -> Result<Vec<String>, anyhow::Error> {
+        let query = MintListQuery::build_query(mint_list_query::Variables {
+            slug: slug.clone(),
+            limit,
+            after,
+        });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<mint_list_query::ResponseData> = response.json().await?;
+
+        if let Some(data) = response_body.data {
+            Ok(data.mint_list)
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

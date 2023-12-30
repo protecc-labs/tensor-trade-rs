@@ -28,11 +28,17 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .get_token_mints_slugs(vec![
+    //             "8h5qaBJxgaDYkt8GKbDtDGUDNbQCWyW5SFCCEnLK76Fe".to_string()
+    //         ])
+    //         .await?
+    // );
+
     dbg!(
         client
-            .get_token_mints_slugs(vec![
-                "8h5qaBJxgaDYkt8GKbDtDGUDNbQCWyW5SFCCEnLK76Fe".to_string()
-            ])
+            .get_mint_list("degods".to_string(), None, None)
             .await?
     );
 

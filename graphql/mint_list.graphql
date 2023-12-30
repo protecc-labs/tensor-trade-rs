@@ -1,0 +1,3 @@
+query MintList($slug: String!, $limit: Int, $after: String) {
+  mintList(slug: $slug, limit: $limit, after: $after)
+}

@@ -76,7 +76,7 @@ pub trait TensorTrade {
 
     async fn get_tcomp_bids(&self, slug: String) -> Result<Vec<TcompBidsTcompBids>, anyhow::Error>;
 
-    async fn get_mints_slugs(
+    async fn get_token_mints_slugs(
         &self,
         token_mints: Vec<String>,
     ) -> Result<Vec<MintsMints>, anyhow::Error>;
@@ -184,7 +184,7 @@ impl TensorTrade for TensorTradeClient {
         }
     }
 
-    async fn get_mints_slugs(
+    async fn get_token_mints_slugs(
         &self,
         token_mints: Vec<String>,
     ) -> Result<Vec<MintsMints>, anyhow::Error> {

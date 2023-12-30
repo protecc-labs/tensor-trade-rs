@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
 
     dbg!(
         client
-            .get_mints_slugs(vec![
+            .get_token_mints_slugs(vec![
                 "8h5qaBJxgaDYkt8GKbDtDGUDNbQCWyW5SFCCEnLK76Fe".to_string()
             ])
             .await?

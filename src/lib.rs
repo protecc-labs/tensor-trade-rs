@@ -1,12 +1,15 @@
-use anyhow::Ok;
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::{header, Client};
 
-mod constants;
-mod types;
+pub mod constants;
+pub mod types;
 
 use constants::TENSOR_TRADE_API_URL;
 use types::queries::{
+    collection_mints::{
+        collection_mints::{self as collection_mints_query, CollectionMintsCollectionMintsV2},
+        CollectionMints as CollectionMintsQuery,
+    },
     collection_stats::{
         collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
         CollectionStats as CollectionStatsQuery,
@@ -101,6 +104,43 @@ pub trait TensorTrade {
         limit: Option<i64>,
         after: Option<String>,
     ) -> Result<Vec<String>, anyhow::Error>;
+
+    // query CollectionMints(
+    //     $slug: String!
+    //     $sortBy: CollectionMintsSortBy!
+    //     $filters: CollectionMintsFilters
+    //     $cursor: String
+    //     $limit: Int
+    //   ) {
+    //     collectionMintsV2(
+    //       slug: $slug
+    //       sortBy: $sortBy
+    //       filters: $filters
+    //       cursor: $cursor
+    //       limit: $limit
+    //     ) {
+    //       mints {
+    //         mint {
+    //           onchainId
+    //           rarityRankHR # HowRare score
+    //           rarityRankTT # Tensor-computed rarity score (similar to HowRare)
+    //         }
+    //       }
+    //       page {
+    //         endCursor
+    //         hasMore
+    //       }
+    //     }
+    //   }
+    // N0TE: Mints are tokens within a collection.
+    async fn get_collection_mints(
+        &self,
+        slug: String,
+        sort_by: collection_mints_query::CollectionMintsSortBy,
+        filters: Option<collection_mints_query::CollectionMintsFilters>,
+        cursor: Option<String>,
+        limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
+    ) -> Result<CollectionMintsCollectionMintsV2, anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -259,6 +299,43 @@ impl TensorTrade for TensorTradeClient {
 
         if let Some(data) = response_body.data {
             Ok(data.mint_list)
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_collection_mints(
+        &self,
+        slug: String,
+        sort_by: collection_mints_query::CollectionMintsSortBy,
+        filters: Option<collection_mints_query::CollectionMintsFilters>,
+        cursor: Option<String>,
+        limit: Option<i64>, // Max.: 100
+    ) -> Result<CollectionMintsCollectionMintsV2, anyhow::Error> {
+        let query = CollectionMintsQuery::build_query(collection_mints_query::Variables {
+            slug: slug.clone(),
+            sort_by,
+            filters,
+            cursor,
+            limit,
+        });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<collection_mints_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(data.collection_mints_v2)
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

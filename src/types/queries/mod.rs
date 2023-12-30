@@ -1,5 +1,6 @@
 mod general;
 
+pub mod collection_mints;
 pub mod collection_stats;
 pub mod mint_list;
 pub mod mints;

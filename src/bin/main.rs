@@ -2,6 +2,7 @@ use anyhow::Result;
 
 extern crate tensor_trade_rs;
 
+use tensor_trade_rs::types::queries::collection_mints::{CollectionMints, CollectionMintsSortBy};
 use tensor_trade_rs::TensorTrade;
 
 #[tokio::main]
@@ -36,11 +37,22 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .get_mint_list("degods".to_string(), None, None)
+    //         .await?
+    // );
+
     dbg!(
         client
-            .get_mint_list("degods".to_string(), None, None)
+            .get_collection_mints(
+                "degods".to_string(),
+                tensor_trade_rs::types::queries::collection_mints::collection_mints::CollectionMintsSortBy::RankHrttAsc,
+                None,
+                None,
+                Some(100)
+            )
             .await?
     );
-
     Ok(())
 }

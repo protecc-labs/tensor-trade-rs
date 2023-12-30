@@ -1,0 +1,27 @@
+query CollectionMints(
+  $slug: String!
+  $sortBy: CollectionMintsSortBy!
+  $filters: CollectionMintsFilters
+  $cursor: String
+  $limit: Int
+) {
+  collectionMintsV2(
+    slug: $slug
+    sortBy: $sortBy
+    filters: $filters
+    cursor: $cursor
+    limit: $limit
+  ) {
+    mints {
+      mint {
+        onchainId
+        rarityRankHR
+        rarityRankTT
+      }
+    }
+    page {
+      endCursor
+      hasMore
+    }
+  }
+}

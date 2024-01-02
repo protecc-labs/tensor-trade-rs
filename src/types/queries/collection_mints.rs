@@ -1,5 +1,4 @@
 use graphql_client::GraphQLQuery;
-use serde::de;
 
 use crate::types::queries::general::Decimal;
 

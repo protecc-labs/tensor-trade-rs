@@ -1,5 +1,3 @@
-use std::io::Cursor;
-
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::{header, Client};
 
@@ -39,6 +37,12 @@ use types::queries::{
             self as user_active_listings_query, UserActiveListingsV2UserActiveListingsV2,
         },
         UserActiveListingsV2 as UserActiveListingsQuery,
+    },
+    user_tensorswap_orders::{
+        user_tensor_swap_orders::{
+            self as user_tensorswap_orders_query, UserTensorSwapOrdersUserTswapOrders,
+        },
+        UserTensorSwapOrders as UserTensorSwapOrdersQuery,
     },
 };
 
@@ -158,6 +162,8 @@ pub trait TensorTrade {
         limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
         slug: Option<String>,
     ) -> Result<(), anyhow::Error>;
+
+    async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -388,6 +394,35 @@ impl TensorTrade for TensorTradeClient {
             response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
         dbg!(&response_body);
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error> {
+        let query =
+            UserTensorSwapOrdersQuery::build_query(user_tensorswap_orders_query::Variables {
+                owner: wallet,
+            });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<user_tensorswap_orders_query::ResponseData> =
+            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+
         if let Some(data) = response_body.data {
             dbg!(&data);
             Ok(())

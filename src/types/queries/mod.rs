@@ -7,3 +7,4 @@ pub mod mints;
 pub mod tcomp_bids;
 pub mod tensorswap_active_orders;
 pub mod user_active_listings;
+pub mod user_tensorswap_orders;

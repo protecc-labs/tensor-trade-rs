@@ -1,0 +1,27 @@
+query UserTensorSwapOrders($owner: String!) {
+  userTswapOrders(owner: $owner) {
+    pool {
+      address
+      createdUnix
+      curveType
+      delta
+      mmFeeBps
+      nftsForSale {
+        onchainId
+      }
+      nftsHeld
+      ownerAddress
+      poolType
+      solBalance
+      startingPrice
+      buyNowPrice
+      sellNowPrice
+      statsAccumulatedMmProfit
+      statsTakerBuyCount
+      statsTakerSellCount
+      takerBuyCount
+      takerSellCount
+      updatedAt
+    }
+  }
+}

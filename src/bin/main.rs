@@ -1,10 +1,7 @@
 use anyhow::Result;
+use tensor_trade_rs::TensorTrade;
 
 extern crate tensor_trade_rs;
-
-use tensor_trade_rs::types::queries::collection_mints::{CollectionMints, CollectionMintsSortBy};
-use tensor_trade_rs::types::queries::user_active_listings::UserActiveListingsV2;
-use tensor_trade_rs::TensorTrade;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -56,16 +53,25 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .get_users_active_listings(
+    //             vec!["CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string()],
+    //             tensor_trade_rs::types::queries::user_active_listings::user_active_listings_v2::ActiveListingsSortBy::PriceAsc,
+    //             None,
+    //             Some(1),
+    //             None,
+    //         )
+    //         .await?
+    // );
+
     dbg!(
         client
-            .get_users_active_listings(
-                vec!["CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string()],
-                tensor_trade_rs::types::queries::user_active_listings::user_active_listings_v2::ActiveListingsSortBy::PriceAsc,
-                None,
-                Some(1),
-                None,
+            .get_user_tensorswap_active_orders(
+                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
             )
             .await?
     );
+
     Ok(())
 }

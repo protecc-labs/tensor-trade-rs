@@ -1,0 +1,31 @@
+query UserActiveListingsV2(
+  $wallets: [String!]!
+  $sortBy: ActiveListingsSortBy!
+  $cursor: ActiveListingsCursorInputV2
+  $limit: Int
+  $slug: String
+) {
+  userActiveListingsV2(
+    wallets: $wallets
+    cursor: $cursor
+    limit: $limit
+    sortBy: $sortBy
+    slug: $slug
+  ) {
+    page {
+      endCursor {
+        str
+      }
+      hasMore
+    }
+    txs {
+      tx {
+        txId
+        txAt
+        source
+        mintOnchainId
+        grossAmount
+      }
+    }
+  }
+}

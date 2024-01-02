@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::{header, Client};
 
@@ -31,6 +33,12 @@ use types::queries::{
             self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
         },
         TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
+    },
+    user_active_listings::{
+        user_active_listings_v2::{
+            self as user_active_listings_query, UserActiveListingsV2UserActiveListingsV2,
+        },
+        UserActiveListingsV2 as UserActiveListingsQuery,
     },
 };
 
@@ -141,6 +149,15 @@ pub trait TensorTrade {
         cursor: Option<String>,
         limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
     ) -> Result<CollectionMintsCollectionMintsV2, anyhow::Error>;
+
+    async fn get_users_active_listings(
+        &self,
+        wallets: Vec<String>,
+        sort_by: user_active_listings_query::ActiveListingsSortBy,
+        cursor: Option<user_active_listings_query::ActiveListingsCursorInputV2>,
+        limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
+        slug: Option<String>,
+    ) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -336,6 +353,44 @@ impl TensorTrade for TensorTradeClient {
         if let Some(data) = response_body.data {
             dbg!(&data);
             Ok(data.collection_mints_v2)
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_users_active_listings(
+        &self,
+        wallets: Vec<String>,
+        sort_by: user_active_listings_query::ActiveListingsSortBy,
+        cursor: Option<user_active_listings_query::ActiveListingsCursorInputV2>,
+        limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
+        slug: Option<String>,
+    ) -> Result<(), anyhow::Error> {
+        let query = UserActiveListingsQuery::build_query(user_active_listings_query::Variables {
+            wallets,
+            sort_by,
+            cursor,
+            limit,
+            slug,
+        });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<user_active_listings_query::ResponseData> =
+            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

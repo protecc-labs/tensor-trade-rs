@@ -38,6 +38,10 @@ use types::queries::{
         },
         UserActiveListingsV2 as UserActiveListingsQuery,
     },
+    user_tcomp_bids::{
+        user_tcomp_bids::{self as user_tcomp_bids_query, UserTcompBidsUserTcompBids},
+        UserTcompBids as UserTcompBidsQuery,
+    },
     user_tensorswap_orders::{
         user_tensor_swap_orders::{
             self as user_tensorswap_orders_query, UserTensorSwapOrdersUserTswapOrders,
@@ -164,6 +168,8 @@ pub trait TensorTrade {
     ) -> Result<(), anyhow::Error>;
 
     async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error>;
+
+    async fn get_user_tcomp_active_bids(&self, wallet: String) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -420,6 +426,32 @@ impl TensorTrade for TensorTradeClient {
 
         let response_body: Response<user_tensorswap_orders_query::ResponseData> =
             response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_user_tcomp_active_bids(&self, wallet: String) -> Result<(), anyhow::Error> {
+        let query =
+            UserTcompBidsQuery::build_query(user_tcomp_bids_query::Variables { owner: wallet });
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<user_tcomp_bids_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
         dbg!(&response_body);
 

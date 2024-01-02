@@ -1,0 +1,15 @@
+query UserTcompBids($owner: String!) {
+  userTcompBids(owner: $owner) {
+    bid {
+      address
+      amount
+      field
+      fieldId
+      filledQuantity
+      quantity
+      solBalance
+      target
+      targetId
+    }
+  }
+}

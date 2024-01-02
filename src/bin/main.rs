@@ -73,5 +73,11 @@ async fn main() -> Result<()> {
             .await?
     );
 
+    dbg!(
+        client
+            .get_user_tcomp_active_bids("CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),)
+            .await?
+    );
+
     Ok(())
 }

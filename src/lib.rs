@@ -1,3 +1,4 @@
+use anyhow::Ok;
 use graphql_client::{GraphQLQuery, Response};
 use reqwest::{header, Client};
 
@@ -34,12 +35,18 @@ use types::queries::{
         },
         TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
     },
-    transactions::tswap_buy_single_listing_tx::{
-        tswap_buy_single_listing_tx::{
-            self as tswap_buy_single_listing_tx_query,
-            TswapBuySingleListingTxTswapBuySingleListingTx,
+    transactions::{
+        tswap_buy_nft_tx::{
+            tswap_buy_nft_tx::{self as tswap_buy_nft_tx_query, TswapBuyNftTxTswapBuyNftTx},
+            TswapBuyNftTx as TswapBuyNftTxQuery,
         },
-        TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+        tswap_buy_single_listing_tx::{
+            tswap_buy_single_listing_tx::{
+                self as tswap_buy_single_listing_tx_query,
+                TswapBuySingleListingTxTswapBuySingleListingTx,
+            },
+            TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+        },
     },
     user_active_listings::{
         user_active_listings_v2::{
@@ -189,6 +196,13 @@ pub trait TensorTrade {
         mint: String,
         owner: String,
     ) -> Result<(), anyhow::Error>;
+
+    async fn get_tensorswap_buy_nft(
+        &self,
+        buyer: String,
+        max_price_lamports: Decimal,
+        mint: String,
+    ) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -257,6 +271,8 @@ impl TensorTrade for TensorTradeClient {
 
         let response_body: Response<tensorswap_active_orders_query::ResponseData> =
             response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
 
         if let Some(data) = response_body.data {
             Ok(data.tswap_orders)
@@ -521,5 +537,62 @@ impl TensorTrade for TensorTradeClient {
             eprintln!("no response data");
             todo!()
         }
+    }
+
+    /// Buy an NFT from a TensorSwap order.
+    /// It gets `pool` from `address` in TensorSwap active order.
+    async fn get_tensorswap_buy_nft(
+        &self,
+        buyer: String,
+        max_price_lamports: Decimal,
+        mint: String,
+    ) -> Result<(), anyhow::Error> {
+        let slug = self.get_token_mints_slugs(vec![mint.clone()]).await?[0]
+            .slug
+            .clone();
+
+        dbg!(slug.clone());
+
+        let active_orders = self.get_active_orders(slug.to_string()).await?;
+        dbg!(&active_orders);
+
+        // If there are no active orders, return an error.
+
+        let address = &active_orders[0].address;
+
+        dbg!(address.clone());
+
+        Ok(())
+
+        // let active_orders = self.get_active_orders(slug).await?;
+
+        // let address = &active_orders[0].address;
+
+        // let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
+        //     buyer,
+        //     max_price_lamports,
+        //     mint,
+        //     pool: address.clone(),
+        // });
+
+        // let response = self
+        //     .client
+        //     .post(TENSOR_TRADE_API_URL)
+        //     .json(&query)
+        //     .send()
+        //     .await?;
+        // // .map(|response| response.error_for_status())??;
+        // let response_body: Response<tswap_buy_nft_tx_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        // dbg!(&response_body);
+
+        // if let Some(data) = response_body.data {
+        //     dbg!(&data);
+        //     Ok(())
+        // } else {
+        //     // Err(TensorTradeError::NoResponseData);
+        //     eprintln!("no response data");
+        //     todo!()
+        // }
     }
 }

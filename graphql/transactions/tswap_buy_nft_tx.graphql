@@ -1,0 +1,19 @@
+query TswapBuyNftTx(
+  $buyer: String!
+  $maxPriceLamports: Decimal!
+  $mint: String!
+  $pool: String!
+) {
+  tswapBuyNftTx(
+    buyer: $buyer
+    maxPriceLamports: $maxPriceLamports
+    mint: $mint
+    pool: $pool
+  ) {
+    txs {
+      lastValidBlockHeight
+      tx
+      txV0 # If this is present, use this!
+    }
+  }
+}

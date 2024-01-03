@@ -9,15 +9,3 @@ use crate::types::queries::general::{Decimal, Timestamp};
     response_derives = "Debug"
 )]
 pub struct UserActiveListingsV2;
-
-pub enum CollectionMintsSortBy {
-    RankHrttAsc,
-}
-
-impl CollectionMintsSortBy {
-    pub fn default() -> Self {
-        CollectionMintsSortBy::RankHrttAsc
-    }
-}
-
-pub struct CollectionMintsFilters {}

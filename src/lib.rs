@@ -2,6 +2,7 @@ use graphql_client::{GraphQLQuery, Response};
 use reqwest::{header, Client};
 
 pub mod constants;
+pub mod helpers;
 pub mod types;
 
 use constants::TENSOR_TRADE_API_URL;
@@ -14,6 +15,7 @@ use types::queries::{
         collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
         CollectionStats as CollectionStatsQuery,
     },
+    general::Decimal,
     mint_list::{
         mint_list::{self as mint_list_query},
         MintList as MintListQuery,
@@ -31,6 +33,13 @@ use types::queries::{
             self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
         },
         TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
+    },
+    transactions::tswap_buy_single_listing_tx::{
+        tswap_buy_single_listing_tx::{
+            self as tswap_buy_single_listing_tx_query,
+            TswapBuySingleListingTxTswapBuySingleListingTx,
+        },
+        TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
     },
     user_active_listings::{
         user_active_listings_v2::{
@@ -170,6 +179,16 @@ pub trait TensorTrade {
     async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error>;
 
     async fn get_user_tcomp_active_bids(&self, wallet: String) -> Result<(), anyhow::Error>;
+
+    // TRANSACTION QUERIES
+
+    async fn get_tensorswap_buy_single_nft_from_listing(
+        &self,
+        buyer: String,
+        max_price: Decimal,
+        mint: String,
+        owner: String,
+    ) -> Result<(), anyhow::Error>;
 }
 
 #[async_trait::async_trait]
@@ -452,6 +471,45 @@ impl TensorTrade for TensorTradeClient {
         // .map(|response| response.error_for_status())??;
 
         let response_body: Response<user_tcomp_bids_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn get_tensorswap_buy_single_nft_from_listing(
+        &self,
+        buyer: String,
+        max_price: Decimal,
+        mint: String,
+        owner: String,
+    ) -> Result<(), anyhow::Error> {
+        let query = TswapBuySingleListingTxQuery::build_query(
+            tswap_buy_single_listing_tx_query::Variables {
+                buyer,
+                max_price,
+                mint,
+                owner,
+            },
+        );
+
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<tswap_buy_single_listing_tx_query::ResponseData> =
+            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
         dbg!(&response_body);
 

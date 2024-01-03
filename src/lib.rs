@@ -7,63 +7,66 @@ pub mod helpers;
 pub mod types;
 
 use constants::TENSOR_TRADE_API_URL;
-use types::queries::{
-    collection_mints::{
-        collection_mints::{self as collection_mints_query, CollectionMintsCollectionMintsV2},
-        CollectionMints as CollectionMintsQuery,
-    },
-    collection_stats::{
-        collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
-        CollectionStats as CollectionStatsQuery,
-    },
-    general::Decimal,
-    mint_list::{
-        mint_list::{self as mint_list_query},
-        MintList as MintListQuery,
-    },
-    mints::{
-        mints::{self as mints_query, MintsMints},
-        Mints as MintsQuery,
-    },
-    tcomp_bids::{
-        tcomp_bids::{self as tcomp_bids_query, TcompBidsTcompBids},
-        TcompBids as TcompBidsQuery,
-    },
-    tensorswap_active_orders::{
-        tensor_swap_active_orders::{
-            self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
+use types::{
+    queries::{
+        collection_mints::{
+            collection_mints::{self as collection_mints_query, CollectionMintsCollectionMintsV2},
+            CollectionMints as CollectionMintsQuery,
         },
-        TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
-    },
-    transactions::{
-        tswap_buy_nft_tx::{
-            tswap_buy_nft_tx::{self as tswap_buy_nft_tx_query, TswapBuyNftTxTswapBuyNftTx},
-            TswapBuyNftTx as TswapBuyNftTxQuery,
+        collection_stats::{
+            collection_stats::{self as collection_stats_query, CollectionStatsInstrumentTv2},
+            CollectionStats as CollectionStatsQuery,
         },
-        tswap_buy_single_listing_tx::{
-            tswap_buy_single_listing_tx::{
-                self as tswap_buy_single_listing_tx_query,
-                TswapBuySingleListingTxTswapBuySingleListingTx,
+        general::Decimal,
+        mint_list::{
+            mint_list::{self as mint_list_query},
+            MintList as MintListQuery,
+        },
+        mints::{
+            mints::{self as mints_query, MintsMints},
+            Mints as MintsQuery,
+        },
+        tcomp_bids::{
+            tcomp_bids::{self as tcomp_bids_query, TcompBidsTcompBids},
+            TcompBids as TcompBidsQuery,
+        },
+        tensorswap_active_orders::{
+            tensor_swap_active_orders::{
+                self as tensorswap_active_orders_query, TensorSwapActiveOrdersTswapOrders,
             },
-            TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+            TensorSwapActiveOrders as TensorSwapActiveOrdersQuery,
+        },
+        transactions::{
+            tswap_buy_nft_tx::{
+                tswap_buy_nft_tx::{self as tswap_buy_nft_tx_query, TswapBuyNftTxTswapBuyNftTx},
+                TswapBuyNftTx as TswapBuyNftTxQuery,
+            },
+            tswap_buy_single_listing_tx::{
+                tswap_buy_single_listing_tx::{
+                    self as tswap_buy_single_listing_tx_query,
+                    TswapBuySingleListingTxTswapBuySingleListingTx,
+                },
+                TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+            },
+        },
+        user_active_listings::{
+            user_active_listings_v2::{
+                self as user_active_listings_query, UserActiveListingsV2UserActiveListingsV2,
+            },
+            UserActiveListingsV2 as UserActiveListingsQuery,
+        },
+        user_tcomp_bids::{
+            user_tcomp_bids::{self as user_tcomp_bids_query, UserTcompBidsUserTcompBids},
+            UserTcompBids as UserTcompBidsQuery,
+        },
+        user_tensorswap_orders::{
+            user_tensor_swap_orders::{
+                self as user_tensorswap_orders_query, UserTensorSwapOrdersUserTswapOrders,
+            },
+            UserTensorSwapOrders as UserTensorSwapOrdersQuery,
         },
     },
-    user_active_listings::{
-        user_active_listings_v2::{
-            self as user_active_listings_query, UserActiveListingsV2UserActiveListingsV2,
-        },
-        UserActiveListingsV2 as UserActiveListingsQuery,
-    },
-    user_tcomp_bids::{
-        user_tcomp_bids::{self as user_tcomp_bids_query, UserTcompBidsUserTcompBids},
-        UserTcompBids as UserTcompBidsQuery,
-    },
-    user_tensorswap_orders::{
-        user_tensor_swap_orders::{
-            self as user_tensorswap_orders_query, UserTensorSwapOrdersUserTswapOrders,
-        },
-        UserTensorSwapOrders as UserTensorSwapOrdersQuery,
-    },
+    responses,
 };
 
 #[derive(Debug, Clone)]
@@ -566,48 +569,50 @@ impl TensorTrade for TensorTradeClient {
             .slug
             .clone();
 
-        dbg!(slug.clone());
+        if self.is_compressed_collection(slug.clone()).await? {
+            eprintln!("compressed collection");
+
+            return Ok(());
+        }
 
         let active_orders = self.get_active_orders(slug.to_string()).await?;
-        dbg!(&active_orders);
 
+        dbg!(active_orders.len());
         // If there are no active orders, return an error.
 
-        let address = &active_orders[0].address;
+        let address = &active_orders.get(0).unwrap().address;
 
-        dbg!(address.clone());
+        dbg!(&buyer);
+        dbg!(&max_price_lamports);
+        dbg!(&mint);
+        dbg!(&address);
 
-        Ok(())
+        let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
+            buyer,
+            max_price_lamports,
+            mint,
+            pool: address.to_string(),
+        });
 
-        // let active_orders = self.get_active_orders(slug).await?;
+        let response = self
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
 
-        // let address = &active_orders[0].address;
+        // .map(|response| response.error_for_status())??;
+        // dbg!(&response.json().await?.data);
+        let response_body: Response<tswap_buy_nft_tx_query::ResponseData> = response.json().await?;
+        // This error should be because of deserialization, not because of the HTTP request.
 
-        // let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
-        //     buyer,
-        //     max_price_lamports,
-        //     mint,
-        //     pool: address.clone(),
-        // });
-
-        // let response = self
-        //     .client
-        //     .post(TENSOR_TRADE_API_URL)
-        //     .json(&query)
-        //     .send()
-        //     .await?;
-        // // .map(|response| response.error_for_status())??;
-        // let response_body: Response<tswap_buy_nft_tx_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
-
-        // dbg!(&response_body);
-
-        // if let Some(data) = response_body.data {
-        //     dbg!(&data);
-        //     Ok(())
-        // } else {
-        //     // Err(TensorTradeError::NoResponseData);
-        //     eprintln!("no response data");
-        //     todo!()
-        // }
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
     }
 }

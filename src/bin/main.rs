@@ -22,11 +22,11 @@ async fn main() -> Result<()> {
     //         .await
     // );
 
-    dbg!(
-        client
-            .is_compressed_collection("froganas".to_string())
-            .await?
-    );
+    // dbg!(
+    //     client
+    //         .is_compressed_collection("froganas".to_string())
+    //         .await?
+    // );
 
     // client
     //     .get_active_orders("duckpunkzuniverse".to_string())
@@ -112,6 +112,16 @@ async fn main() -> Result<()> {
     //         )
     //         .await?
     // );
+
+    dbg!(
+        client
+            .get_tensorswap_buy_nft(
+                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+                Decimal("2900000000".to_string()),
+                "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+            )
+            .await?
+    );
 
     Ok(())
 }

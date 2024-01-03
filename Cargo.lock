@@ -658,6 +658,9 @@ name = "bytes"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "caps"
@@ -4218,10 +4221,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "bytes",
  "dotenv",
  "graphql_client",
  "reqwest",
  "serde",
+ "serde_bytes",
  "serde_json",
  "solana-client",
  "solana-sdk",

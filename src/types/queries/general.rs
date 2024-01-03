@@ -10,4 +10,7 @@ pub struct Timestamp(pub i64);
 pub struct BigInt(pub String);
 
 #[derive(Debug, Deserialize)]
-pub struct Byte(pub String);
+pub struct Byte {
+    #[serde(with = "serde_bytes")]
+    pub data: Vec<u8>,
+}

@@ -16,10 +16,16 @@ async fn main() -> Result<()> {
     //     .get_collection_stats("rfijruifrnufnre".to_string())
     //     .await;
 
+    // dbg!(
+    //     client
+    //         .get_collection_stats("05c52d84-2e49-4ed9-a473-b43cab41e777".to_string())
+    //         .await
+    // );
+
     dbg!(
         client
-            .get_collection_stats("05c52d84-2e49-4ed9-a473-b43cab41e777".to_string())
-            .await
+            .is_compressed_collection("froganas".to_string())
+            .await?
     );
 
     // client

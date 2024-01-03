@@ -197,6 +197,8 @@ pub trait TensorTrade {
         owner: String,
     ) -> Result<(), anyhow::Error>;
 
+    async fn is_compressed_collection(&self, slug: String) -> Result<bool, anyhow::Error>;
+
     async fn get_tensorswap_buy_nft(
         &self,
         buyer: String,
@@ -535,6 +537,19 @@ impl TensorTrade for TensorTradeClient {
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    async fn is_compressed_collection(&self, slug: String) -> Result<bool, anyhow::Error> {
+        let collection_stats: Option<CollectionStatsInstrumentTv2> =
+            self.get_collection_stats(slug).await?;
+
+        if let Some(collection_stats) = collection_stats {
+            Ok(collection_stats.compressed)
+        } else {
+            // Err(TensorTradeError::NoCollectionStats);
+            eprintln!("no collection stats");
             todo!()
         }
     }

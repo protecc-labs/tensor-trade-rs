@@ -1,12 +1,20 @@
 use reqwest::header;
 
+pub(crate) mod collection;
 pub(crate) mod user;
 
 mod constants;
 
-pub use crate::user::user_active_listings_query::{
-    ActiveListingsCursorInputV2, ActiveListingsSortBy,
+pub use crate::{
+    collection::collection_mints_query::{CollectionMintsFilters, CollectionMintsSortBy},
+    user::user_active_listings_query::{ActiveListingsCursorInputV2, ActiveListingsSortBy},
 };
+
+impl Default for CollectionMintsSortBy {
+    fn default() -> Self {
+        Self::RankHrttAsc
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct TensorTradeClient {
@@ -27,6 +35,10 @@ impl TensorTradeClient {
             .build()?;
 
         Ok(Self { client })
+    }
+
+    pub fn collection(&self) -> collection::Collection {
+        collection::Collection(self)
     }
 
     pub fn user(&self) -> user::User {

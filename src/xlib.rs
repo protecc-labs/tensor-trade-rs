@@ -186,8 +186,6 @@ pub trait TensorTrade {
         slug: Option<String>,
     ) -> Result<(), anyhow::Error>;
 
-    // TRANSACTION QUERIES
-
     async fn get_tensorswap_buy_single_nft_from_listing(
         &self,
         buyer: String,
@@ -208,40 +206,6 @@ pub trait TensorTrade {
 
 #[async_trait::async_trait]
 impl TensorTrade for TensorTradeClient {
-    /// Single Collection Stats & Metadata
-    async fn get_collection_stats(
-        &self,
-        slug: String,
-    ) -> Result<Option<CollectionStatsInstrumentTv2>, anyhow::Error> {
-        let query = CollectionStatsQuery::build_query(collection_stats_query::Variables {
-            slug: slug.clone(),
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<collection_stats_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
-
-        if let Some(data) = response_body.data {
-            if let Some(instrument_tv2) = data.instrument_tv2 {
-                Ok(Some(instrument_tv2))
-            } else {
-                // Err(TensorTradeError::NoInstrumentTV2);
-                eprintln!("no collection stats");
-                todo!()
-            }
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
     // async fn get_active_listings(
     //     &self,
     //     slug: String,
@@ -364,43 +328,6 @@ impl TensorTrade for TensorTradeClient {
 
         if let Some(data) = response_body.data {
             Ok(data.mint_list)
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
-    async fn get_collection_mints(
-        &self,
-        slug: String,
-        sort_by: collection_mints_query::CollectionMintsSortBy,
-        filters: Option<collection_mints_query::CollectionMintsFilters>,
-        cursor: Option<String>,
-        limit: Option<i64>, // Max.: 100
-    ) -> Result<CollectionMintsCollectionMintsV2, anyhow::Error> {
-        let query = CollectionMintsQuery::build_query(collection_mints_query::Variables {
-            slug: slug.clone(),
-            sort_by,
-            filters,
-            cursor,
-            limit,
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<collection_mints_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
-
-        dbg!(&response_body);
-        if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(data.collection_mints_v2)
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

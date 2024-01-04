@@ -7,28 +7,45 @@ async fn main() -> Result<()> {
     let api_key = std::env::var("TENSOR_TRADE_API_KEY")?;
     let client = tensor_trade_rs::TensorTradeClient::new(&api_key)?;
 
-    dbg!(
-        client
-            .user()
-            .get_active_listings(
-                vec!["9gVndQ5SdugdFfGzyuKmePLRJZkCreKZ2iUTEg4agR5g".to_string()],
-                tensor_trade_rs::ActiveListingsSortBy::PriceAsc,
-                None,
-                Some(1),
-                None,
-            )
-            .await?
-    );
-
-    // client
-    //     .get_collection_stats("rfijruifrnufnre".to_string())
-    //     .await;
+    // dbg!(
+    //     client
+    //         .user()
+    //         .get_active_listings(
+    //             vec!["9gVndQ5SdugdFfGzyuKmePLRJZkCreKZ2iUTEg4agR5g".to_string()],
+    //             tensor_trade_rs::ActiveListingsSortBy::PriceAsc,
+    //             None,
+    //             Some(1),
+    //             None,
+    //         )
+    //         .await?
+    // );
 
     // dbg!(
     //     client
-    //         .get_collection_stats("05c52d84-2e49-4ed9-a473-b43cab41e777".to_string())
-    //         .await
+    //         .collection()
+    //         .get_stats("tensorians".to_string())
+    //         .await?
     // );
+
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_stats("ijfurfnerufnef".to_string())
+    //         .await?
+    // );
+
+    dbg!(
+        client
+            .collection()
+            .get_token_mints(
+                "degods".to_string(),
+                tensor_trade_rs::CollectionMintsSortBy::default(),
+                None,
+                None,
+                None
+            )
+            .await?
+    );
 
     // dbg!(
     //     client
@@ -57,18 +74,6 @@ async fn main() -> Result<()> {
     // dbg!(
     //     client
     //         .get_mint_list("degods".to_string(), None, None)
-    //         .await?
-    // );
-
-    // dbg!(
-    //     client
-    //         .get_collection_mints(
-    //             "degods".to_string(),
-    //             tensor_trade_rs::types::queries::collection_mints::collection_mints::CollectionMintsSortBy::RankHrttAsc,
-    //             None,
-    //             None,
-    //             Some(100)
-    //         )
     //         .await?
     // );
 

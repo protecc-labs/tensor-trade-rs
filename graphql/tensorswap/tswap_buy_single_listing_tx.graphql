@@ -13,7 +13,7 @@ query TswapBuySingleListingTx(
     txs {
       lastValidBlockHeight
       tx
-      txV0 # If this is present, use this!
+      txV0
     }
   }
 }

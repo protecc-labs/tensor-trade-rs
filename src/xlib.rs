@@ -199,49 +199,6 @@ pub trait TensorTrade {
 
 #[async_trait::async_trait]
 impl TensorTrade for TensorTradeClient {
-    // async fn get_active_listings(
-    //     &self,
-    //     slug: String,
-    //     sort_by: SortBy,
-    //     filters: Option<Filters>,
-    //     limit: Option<Limit>,
-    //     cursor: Option<Cursor>,
-    // ) {
-    // }
-
-    /// TensorSwap Active Orders
-    async fn get_active_orders(
-        &self,
-        slug: String,
-    ) -> Result<Vec<TensorSwapActiveOrdersTswapOrders>, anyhow::Error> {
-        let query =
-            TensorSwapActiveOrdersQuery::build_query(tensorswap_active_orders_query::Variables {
-                slug: slug.clone(),
-            });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<tensorswap_active_orders_query::ResponseData> =
-            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
-
-        dbg!(&response_body);
-
-        if let Some(data) = response_body.data {
-            Ok(data.tswap_orders)
-            // TODO: Warn user if `data.tswap_orders` is empty.
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
     async fn get_tcomp_active_bids(
         &self,
         slug: String,
@@ -263,44 +220,6 @@ impl TensorTrade for TensorTradeClient {
             // TODO: Warn user if `data.tcomp_bids` is empty.
             // TODO: This endpoint also returns all the trait bids for both compressed and non-compressed NFTs.
             // Any bid that has a non-empty attributes array is a trait bid.
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
-    async fn get_users_active_listings(
-        &self,
-        wallets: Vec<String>,
-        sort_by: user_active_listings_query::ActiveListingsSortBy,
-        cursor: Option<user_active_listings_query::ActiveListingsCursorInputV2>,
-        limit: Option<i64>, // TODO: If this is `None`, it'll throw an error when sending the request.
-        slug: Option<String>,
-    ) -> Result<(), anyhow::Error> {
-        let query = UserActiveListingsQuery::build_query(user_active_listings_query::Variables {
-            wallets,
-            sort_by,
-            cursor,
-            limit,
-            slug,
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<user_active_listings_query::ResponseData> =
-            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
-
-        dbg!(&response_body);
-        if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");
@@ -391,78 +310,6 @@ impl TensorTrade for TensorTradeClient {
             response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
         dbg!(&response_body);
-
-        if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
-    async fn is_compressed_collection(&self, slug: String) -> Result<bool, anyhow::Error> {
-        let collection_stats: Option<CollectionStatsInstrumentTv2> =
-            self.get_collection_stats(slug).await?;
-
-        if let Some(collection_stats) = collection_stats {
-            Ok(collection_stats.compressed)
-        } else {
-            // Err(TensorTradeError::NoCollectionStats);
-            eprintln!("no collection stats");
-            todo!()
-        }
-    }
-
-    /// Buy an NFT from a TensorSwap order.
-    /// It gets `pool` from `address` in TensorSwap active order.
-    async fn get_tensorswap_buy_nft(
-        &self,
-        buyer: String,
-        max_price_lamports: Decimal,
-        mint: String,
-    ) -> Result<(), anyhow::Error> {
-        let slug = self.get_token_mints_slugs(vec![mint.clone()]).await?[0]
-            .slug
-            .clone();
-
-        if self.is_compressed_collection(slug.clone()).await? {
-            eprintln!("compressed collection");
-
-            return Ok(());
-        }
-
-        let active_orders = self.get_active_orders(slug.to_string()).await?;
-
-        dbg!(active_orders.len());
-        // If there are no active orders, return an error.
-
-        let address = &active_orders.get(0).unwrap().address;
-
-        dbg!(&buyer);
-        dbg!(&max_price_lamports);
-        dbg!(&mint);
-        dbg!(&address);
-
-        let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
-            buyer,
-            max_price_lamports,
-            mint,
-            pool: address.to_string(),
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-
-        // .map(|response| response.error_for_status())??;
-        // dbg!(&response.json().await?.data);
-        let response_body: Response<tswap_buy_nft_tx_query::ResponseData> = response.json().await?;
-        // This error should be because of deserialization, not because of the HTTP request.
 
         if let Some(data) = response_body.data {
             dbg!(&data);

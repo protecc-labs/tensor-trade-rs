@@ -14,16 +14,23 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
-    dbg!(
-        client
-            .collection()
-            .get_token_mint_list(
-                "05c52d84-2e49-4ed9-a473-b43cab41e777".to_string(),
-                None,
-                None
-            )
-            .await?
-    );
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_token_mint_list(
+    //             "05c52d84-2e49-4ed9-a473-b43cab41e777".to_string(),
+    //             None,
+    //             None
+    //         )
+    //         .await?
+    // );
+
+    // dbg!(
+    //     client
+    //         .tensorswap()
+    //         .get_active_orders("duckpunkzuniverse".to_string())
+    //         .await?
+    // );
 
     // dbg!(
     //     client
@@ -65,12 +72,12 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
-    dbg!(
-        client
-            .collection()
-            .is_compressed("tensorians".to_string())
-            .await?
-    );
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .is_compressed("tensorians".to_string())
+    //         .await?
+    // );
 
     // dbg!(
     //     client
@@ -143,23 +150,25 @@ async fn main() -> Result<()> {
 
     // dbg!(
     //     client
+    //         .tensorswap()
     //         .get_tensorswap_buy_nft(
     //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
-    //             Decimal("3000000000".to_string()),
+    //             "3000000000".to_string(),
     //             "8zkfLBNFwo1SN13tDA6XE5VDXFDpG8jZLNo4pyCexFhP".to_string(),
     //         )
     //         .await?
     // );
 
-    // dbg!(
-    //     client
-    //         .get_tensorswap_buy_nft(
-    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
-    //             Decimal("2900000000".to_string()),
-    //             "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
-    //         )
-    //         .await?
-    // );
+    dbg!(
+        client
+            .tensorswap()
+            .get_tensorswap_buy_nft(
+                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+                "2900000000".to_string(),
+                "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+            )
+            .await?
+    );
 
     Ok(())
 }

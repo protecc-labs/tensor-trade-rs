@@ -1,6 +1,7 @@
 use reqwest::header;
 
 pub(crate) mod collection;
+pub(crate) mod tensorswap;
 pub(crate) mod user;
 
 mod constants;
@@ -43,5 +44,9 @@ impl TensorTradeClient {
 
     pub fn user(&self) -> user::User {
         user::User(self)
+    }
+
+    pub fn tensorswap(&self) -> tensorswap::Tensorswap {
+        tensorswap::Tensorswap(self)
     }
 }

@@ -34,16 +34,23 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_token_mints(
+    //             "degods".to_string(),
+    //             tensor_trade_rs::CollectionMintsSortBy::default(),
+    //             None,
+    //             None,
+    //             None
+    //         )
+    //         .await?
+    // );
+
     dbg!(
         client
             .collection()
-            .get_token_mints(
-                "degods".to_string(),
-                tensor_trade_rs::CollectionMintsSortBy::default(),
-                None,
-                None,
-                None
-            )
+            .is_compressed("tensorians".to_string())
             .await?
     );
 

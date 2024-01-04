@@ -1,5 +1,9 @@
+use std::f32::consts::E;
+
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
+
+use crate::user::User;
 
 use super::{constants, TensorTradeClient};
 
@@ -18,9 +22,7 @@ impl<'a> Collection<'a> {
         &self,
         slug: String,
     ) -> Result<Option<collection_stats_query::CollectionStatsInstrumentTv2>, anyhow::Error> {
-        let query = CollectionStatsQuery::build_query(collection_stats_query::Variables {
-            slug: slug.clone(),
-        });
+        let query = CollectionStatsQuery::build_query(collection_stats_query::Variables { slug });
 
         let response = self
             .0
@@ -63,7 +65,7 @@ impl<'a> Collection<'a> {
         };
 
         let query = CollectionMintsQuery::build_query(collection_mints_query::Variables {
-            slug: slug.clone(),
+            slug,
             sort_by,
             filters,
             cursor,
@@ -89,6 +91,16 @@ impl<'a> Collection<'a> {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");
             todo!()
+        }
+    }
+
+    pub async fn is_compressed(&self, slug: String) -> anyhow::Result<bool> {
+        let stats = self.get_stats(slug).await?;
+
+        if let Some(stats) = stats {
+            Ok(stats.compressed)
+        } else {
+            Err(anyhow::anyhow!("no stats"))
         }
     }
 }

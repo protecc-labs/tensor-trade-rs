@@ -4216,7 +4216,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tensor-trade-rs"
+name = "tensor-trade"
 version = "0.1.0"
 dependencies = [
  "anyhow",

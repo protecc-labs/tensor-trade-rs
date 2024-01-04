@@ -1,9 +1,13 @@
 [package]
-name = "tensor-trade-rs"
+name = "tensor-trade"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["mektigboy <mektigboy@protonmail.com>"]
+description = "A client for Tensor NFT marketplace and its aggregated marketplaces."
+repository = "https://github.com/protecc-labs/tensor-trade-rs"
+license = "MIT"
+categories = ["graphql", "reqwest", "nft"]
+keywords = ["tensor", "tensorswap"]
 
 [dependencies]
 anyhow = "1.0.77"

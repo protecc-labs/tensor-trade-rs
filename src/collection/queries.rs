@@ -33,3 +33,11 @@ pub struct CollectionMints;
     response_derives = "Debug"
 )]
 pub struct Mints;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
+    query_path = "graphql/collection/mint_list.graphql",
+    response_derives = "Debug"
+)]
+pub struct MintList;

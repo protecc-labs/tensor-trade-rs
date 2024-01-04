@@ -7,8 +7,8 @@ mod queries;
 
 pub(crate) use queries::{
     collection_mints as collection_mints_query, collection_stats as collection_stats_query,
-    mints as mints_query, CollectionMints as CollectionMintsQuery,
-    CollectionStats as CollectionStatsQuery, Mints as MintsQuery,
+    mint_list as mint_list_query, mints as mints_query, CollectionMints as CollectionMintsQuery,
+    CollectionStats as CollectionStatsQuery, MintList as MintListQuery, Mints as MintsQuery,
 };
 
 pub struct Collection<'a>(pub(crate) &'a TensorTradeClient);
@@ -38,6 +38,50 @@ impl<'a> Collection<'a> {
             } else {
                 // Err(TensorTradeError::NoInstrumentTV2);
                 eprintln!("no collection stats");
+                todo!()
+            }
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    pub async fn get_token_mint_list(
+        &self,
+        slug: String,
+        mut limit: Option<i64>,
+        after: Option<String>,
+    ) -> Result<Vec<String>, anyhow::Error> {
+        if limit.is_none() {
+            limit = Some(100)
+        };
+
+        let query = MintListQuery::build_query(mint_list_query::Variables {
+            slug: slug.clone(),
+            limit,
+            after,
+        });
+
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<mint_list_query::ResponseData> = response.json().await?;
+
+        if let Some(data) = response_body.data {
+            let mint_list = data.mint_list;
+
+            if !mint_list.is_empty() {
+                Ok(mint_list)
+            } else {
+                // Err(TensorTradeError::NoMintList);
+                eprintln!("no mint list");
                 todo!()
             }
         } else {

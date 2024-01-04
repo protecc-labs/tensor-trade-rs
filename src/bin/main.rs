@@ -7,10 +7,21 @@ async fn main() -> Result<()> {
     let api_key = std::env::var("TENSOR_TRADE_API_KEY")?;
     let client = tensor_trade_rs::TensorTradeClient::new(&api_key)?;
 
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_slug("8zkfLBNFwo1SN13tDA6XE5VDXFDpG8jZLNo4pyCexFhP".to_string())
+    //         .await?
+    // );
+
     dbg!(
         client
             .collection()
-            .get_slug("8zkfLBNFwo1SN13tDA6XE5VDXFDpG8jZLNo4pyCexFhP".to_string())
+            .get_token_mint_list(
+                "05c52d84-2e49-4ed9-a473-b43cab41e777".to_string(),
+                None,
+                None
+            )
             .await?
     );
 

@@ -270,64 +270,6 @@ impl TensorTrade for TensorTradeClient {
         }
     }
 
-    async fn get_token_mints_slugs(
-        &self,
-        token_mints: Vec<String>,
-    ) -> Result<Vec<MintsMints>, anyhow::Error> {
-        let query = MintsQuery::build_query(mints_query::Variables {
-            token_mints: token_mints.clone(),
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<mints_query::ResponseData> = response.json().await?;
-
-        if let Some(data) = response_body.data {
-            Ok(data.mints)
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
-    async fn get_mint_list(
-        &self,
-        slug: String,
-        limit: Option<i64>,
-        after: Option<String>,
-    ) -> Result<Vec<String>, anyhow::Error> {
-        let query = MintListQuery::build_query(mint_list_query::Variables {
-            slug: slug.clone(),
-            limit,
-            after,
-        });
-
-        let response = self
-            .client
-            .post(TENSOR_TRADE_API_URL)
-            .json(&query)
-            .send()
-            .await?;
-        // .map(|response| response.error_for_status())??;
-
-        let response_body: Response<mint_list_query::ResponseData> = response.json().await?;
-
-        if let Some(data) = response_body.data {
-            Ok(data.mint_list)
-        } else {
-            // Err(TensorTradeError::NoResponseData);
-            eprintln!("no response data");
-            todo!()
-        }
-    }
-
     async fn get_users_active_listings(
         &self,
         wallets: Vec<String>,

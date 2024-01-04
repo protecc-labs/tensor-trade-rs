@@ -159,13 +159,35 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .tensorswap()
+    //         .get_buy_order_tx(
+    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+    //             "2900000000".to_string(),
+    //             "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+    //         )
+    //         .await?
+    // );
+
+    // dbg!(
+    //     client
+    //         .tensorswap()
+    //         .get_buy_listing_tx(
+    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+    //             "2900000000".to_string(),
+    //             "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+    //         )
+    //         .await?
+    // );
+
     dbg!(
         client
             .tensorswap()
-            .get_buy_order_tx(
-                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
-                "2900000000".to_string(),
-                "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+            .get_list_nft_tx(
+                "32aexhaNYWdaN8vpuUmk4YR1EN6jfQnWV2myekYYNyEN",
+                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
+                "13000000000"
             )
             .await?
     );

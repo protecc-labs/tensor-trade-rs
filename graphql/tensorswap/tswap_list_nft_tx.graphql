@@ -1,0 +1,9 @@
+query TswapListNftTx($mint: String!, $owner: String!, $price: Decimal!) {
+  tswapListNftTx(mint: $mint, owner: $owner, price: $price) {
+    txs {
+      lastValidBlockHeight
+      tx
+      txV0
+    }
+  }
+}

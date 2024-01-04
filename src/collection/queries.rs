@@ -13,6 +13,14 @@ pub struct BigInt(pub String);
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "graphql/schema.json",
+    query_path = "graphql/collection/collection_stats.graphql",
+    response_derives = "Debug"
+)]
+pub struct CollectionStats;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
     query_path = "graphql/collection/collection_mints.graphql",
     response_derives = "Debug"
 )]
@@ -21,7 +29,7 @@ pub struct CollectionMints;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "graphql/schema.json",
-    query_path = "graphql/collection/collection_stats.graphql",
+    query_path = "graphql/collection/mints.graphql",
     response_derives = "Debug"
 )]
-pub struct CollectionStats;
+pub struct Mints;

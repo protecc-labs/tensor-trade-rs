@@ -7,7 +7,8 @@ mod queries;
 
 pub(crate) use queries::{
     collection_mints as collection_mints_query, collection_stats as collection_stats_query,
-    CollectionMints as CollectionMintsQuery, CollectionStats as CollectionStatsQuery,
+    mints as mints_query, CollectionMints as CollectionMintsQuery,
+    CollectionStats as CollectionStatsQuery, Mints as MintsQuery,
 };
 
 pub struct Collection<'a>(pub(crate) &'a TensorTradeClient);
@@ -83,6 +84,40 @@ impl<'a> Collection<'a> {
         if let Some(data) = response_body.data {
             dbg!(&data);
             Ok(data.collection_mints_v2)
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    // Get the slug for a collection with any token mint in it.
+    pub async fn get_slug(&self, token_mint: String) -> anyhow::Result<String> {
+        let query = MintsQuery::build_query(mints_query::Variables {
+            token_mints: vec![token_mint],
+        });
+
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<mints_query::ResponseData> = response.json().await?;
+
+        if let Some(data) = response_body.data {
+            let mints = data.mints;
+
+            if let Some(mint) = mints.into_iter().next() {
+                Ok(mint.slug)
+            } else {
+                // Err(TensorTradeError::NoMints);
+                eprintln!("no mints");
+                todo!()
+            }
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

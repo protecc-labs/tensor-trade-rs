@@ -94,11 +94,6 @@ impl TensorTradeClient {
 
 #[async_trait::async_trait]
 pub trait TensorTrade {
-    async fn get_collection_stats(
-        &self,
-        slug: String,
-    ) -> Result<Option<CollectionStatsInstrumentTv2>, anyhow::Error>;
-
     // async fn get_active_listings(
     //     &self,
     //     slug: String,
@@ -193,8 +188,6 @@ pub trait TensorTrade {
         mint: String,
         owner: String,
     ) -> Result<(), anyhow::Error>;
-
-    async fn is_compressed_collection(&self, slug: String) -> Result<bool, anyhow::Error>;
 
     async fn get_tensorswap_buy_nft(
         &self,

@@ -1,16 +1,24 @@
 use anyhow::Result;
 
-extern crate tensor_trade_rs;
-
-use tensor_trade_rs::{types::queries::general::Decimal, TensorTrade};
-
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
     let api_key = std::env::var("TENSOR_TRADE_API_KEY")?;
+    let client = tensor_trade_rs::TensorTradeClient::new(&api_key)?;
 
-    let client = tensor_trade_rs::TensorTradeClient::new(api_key);
+    dbg!(
+        client
+            .user()
+            .get_active_listings(
+                vec!["9gVndQ5SdugdFfGzyuKmePLRJZkCreKZ2iUTEg4agR5g".to_string()],
+                tensor_trade_rs::ActiveListingsSortBy::PriceAsc,
+                None,
+                Some(1),
+                None,
+            )
+            .await?
+    );
 
     // client
     //     .get_collection_stats("rfijruifrnufnre".to_string())
@@ -113,15 +121,15 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
-    dbg!(
-        client
-            .get_tensorswap_buy_nft(
-                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
-                Decimal("2900000000".to_string()),
-                "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
-            )
-            .await?
-    );
+    // dbg!(
+    //     client
+    //         .get_tensorswap_buy_nft(
+    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+    //             Decimal("2900000000".to_string()),
+    //             "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),
+    //         )
+    //         .await?
+    // );
 
     Ok(())
 }

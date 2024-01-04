@@ -1,9 +1,5 @@
-use std::f32::consts::E;
-
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
-
-use crate::user::User;
 
 use super::{constants, TensorTradeClient};
 

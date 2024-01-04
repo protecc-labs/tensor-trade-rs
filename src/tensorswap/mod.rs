@@ -53,7 +53,7 @@ impl<'a> Tensorswap<'a> {
         }
     }
 
-    pub async fn get_tensorswap_buy_single_nft_from_listing(
+    pub async fn get_buy_listing_tx(
         &self,
         buyer: String,
         max_price: Decimal,
@@ -93,7 +93,7 @@ impl<'a> Tensorswap<'a> {
         }
     }
 
-    pub async fn get_tensorswap_buy_nft(
+    pub async fn get_buy_order_tx(
         &self,
         buyer: String,
         max_price_lamports: String,

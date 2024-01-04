@@ -162,7 +162,7 @@ async fn main() -> Result<()> {
     dbg!(
         client
             .tensorswap()
-            .get_tensorswap_buy_nft(
+            .get_buy_order_tx(
                 "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
                 "2900000000".to_string(),
                 "6372Z4BSZBuVChZJWeHpJz68WoXqiSagA4egmQrubUT9".to_string(),

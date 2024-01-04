@@ -53,6 +53,46 @@ impl<'a> Tensorswap<'a> {
         }
     }
 
+    pub async fn get_tensorswap_buy_single_nft_from_listing(
+        &self,
+        buyer: String,
+        max_price: Decimal,
+        mint: String,
+        owner: String,
+    ) -> Result<(), anyhow::Error> {
+        let query = TswapBuySingleListingTxQuery::build_query(
+            tswap_buy_single_listing_tx_query::Variables {
+                buyer,
+                max_price,
+                mint,
+                owner,
+            },
+        );
+
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<tswap_buy_single_listing_tx_query::ResponseData> =
+            response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
     pub async fn get_tensorswap_buy_nft(
         &self,
         buyer: String,

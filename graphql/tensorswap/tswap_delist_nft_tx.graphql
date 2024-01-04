@@ -1,0 +1,9 @@
+query TswapDelistNftTx($mint: String!, $owner: String!) {
+  tswapDelistNftTx(mint: $mint, owner: $owner) {
+    txs {
+      lastValidBlockHeight
+      tx
+      txV0
+    }
+  }
+}

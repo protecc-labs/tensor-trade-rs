@@ -181,10 +181,21 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .tensorswap()
+    //         .get_list_nft_tx(
+    //             "32aexhaNYWdaN8vpuUmk4YR1EN6jfQnWV2myekYYNyEN",
+    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
+    //             "13000000000"
+    //         )
+    //         .await?
+    // );
+
     dbg!(
         client
             .tensorswap()
-            .get_list_nft_tx(
+            .get_edit_listing_tx(
                 "32aexhaNYWdaN8vpuUmk4YR1EN6jfQnWV2myekYYNyEN",
                 "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
                 "13000000000"

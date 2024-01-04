@@ -47,3 +47,11 @@ pub struct TswapBuySingleListingTx;
     response_derives = "Debug"
 )]
 pub struct TswapListNftTx;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
+    query_path = "graphql/tensorswap/tswap_edit_single_listing_tx.graphql",
+    response_derives = "Debug"
+)]
+pub struct TswapEditSingleListingTx;

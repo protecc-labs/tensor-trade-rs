@@ -11,9 +11,12 @@ pub(crate) use queries::{
     tensor_swap_active_orders as tensorswap_active_orders_query,
     tswap_buy_nft_tx as tswap_buy_nft_tx_query,
     tswap_buy_single_listing_tx as tswap_buy_single_listing_tx_query,
+    tswap_edit_single_listing_tx as tswap_edit_single_listing_tx_query,
     tswap_list_nft_tx as tswap_list_nft_tx_query,
     TensorSwapActiveOrders as TensorswapActiveOrdersQuery, TswapBuyNftTx as TswapBuyNftTxQuery,
-    TswapBuySingleListingTx as TswapBuySingleListingTxQuery, TswapListNftTx as TswapListNftTxQuery,
+    TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+    TswapEditSingleListingTx as TswapEditSingleListingTxQuery,
+    TswapListNftTx as TswapListNftTxQuery,
 };
 
 pub struct Tensorswap<'a>(pub(crate) &'a TensorTradeClient);
@@ -188,6 +191,51 @@ impl<'a> Tensorswap<'a> {
         // .map(|response| response.error_for_status())??;
         // dbg!(&response.json().await?.data);
         let response_body: Response<tswap_list_nft_tx_query::ResponseData> =
+            response.json().await?;
+        // This error should be because of deserialization, not because of the HTTP request.
+
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    pub async fn get_edit_listing_tx(
+        &self,
+        mint: &str,
+        owner: &str,
+        price: &str,
+    ) -> anyhow::Result<()> {
+        let slug = self.0.collection().get_slug(mint.into()).await?;
+
+        if self.0.collection().is_compressed(slug.clone()).await? {
+            eprintln!("cannot edit compressed NFTs - use tcomp edit instead");
+            return Ok(());
+        }
+
+        let query = TswapEditSingleListingTxQuery::build_query(
+            tswap_edit_single_listing_tx_query::Variables {
+                mint: mint.into(),
+                owner: owner.into(),
+                price: Decimal(price.into()),
+            },
+        );
+
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+
+        // .map(|response| response.error_for_status())??;
+        // dbg!(&response.json().await?.data);
+        let response_body: Response<tswap_edit_single_listing_tx_query::ResponseData> =
             response.json().await?;
         // This error should be because of deserialization, not because of the HTTP request.
 

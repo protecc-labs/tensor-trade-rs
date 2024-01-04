@@ -5,7 +5,7 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
     let api_key = std::env::var("TENSOR_TRADE_API_KEY")?;
-    let client = tensor_trade_rs::TensorTradeClient::new(&api_key)?;
+    let client = tensor_trade::TensorTradeClient::new(&api_key)?;
 
     // dbg!(
     //     client

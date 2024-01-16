@@ -212,9 +212,10 @@ async fn main() -> Result<()> {
     dbg!(
         client
             .execute()
-            .delist(
-                "32aexhaNYWdaN8vpuUmk4YR1EN6jfQnWV2myekYYNyEN",
+            .edit_listing(
+                "HjzZCm72jgy2LPyGmkRf6JhUBUH1v2egKBCGFVww1iCD",
                 "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
+                "30000000000"
             )
             .await?
     );

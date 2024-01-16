@@ -170,12 +170,12 @@ impl<'a> Tensorswap<'a> {
         mint: &str,
         owner: &str,
         price: &str,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
         let slug = self.0.collection().get_slug(mint.into()).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot list compressed NFTs - use tcomp list instead");
-            return Ok(());
+            return Ok(None);
         }
 
         let query = TswapListNftTxQuery::build_query(tswap_list_nft_tx_query::Variables {
@@ -199,8 +199,10 @@ impl<'a> Tensorswap<'a> {
         // This error should be because of deserialization, not because of the HTTP request.
 
         if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
+            let txs = data.tswap_list_nft_tx.txs[0].clone();
+            let tx = txs.tx;
+            let tx_v0 = txs.tx_v0;
+            Ok(Some((tx, tx_v0)))
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");
@@ -213,12 +215,12 @@ impl<'a> Tensorswap<'a> {
         mint: &str,
         owner: &str,
         price: &str,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
         let slug = self.0.collection().get_slug(mint.into()).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot edit compressed NFTs - use tcomp edit instead");
-            return Ok(());
+            return Ok(None);
         }
 
         let query = TswapEditSingleListingTxQuery::build_query(
@@ -244,8 +246,10 @@ impl<'a> Tensorswap<'a> {
         // This error should be because of deserialization, not because of the HTTP request.
 
         if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
+            let txs = data.tswap_edit_single_listing_tx.txs[0].clone();
+            let tx = txs.tx;
+            let tx_v0 = txs.tx_v0;
+            Ok(Some((tx, tx_v0)))
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

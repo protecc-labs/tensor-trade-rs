@@ -1,5 +1,6 @@
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
+use std::vec;
 
 use super::{constants, TensorTradeClient};
 
@@ -10,6 +11,8 @@ pub(crate) use queries::{
     UserActiveListingsV2 as UserActiveListingsQuery,
 };
 
+pub type UserActiveListings = user_active_listings_query::UserActiveListingsV2UserActiveListingsV2;
+
 pub struct User<'a>(pub(crate) &'a TensorTradeClient);
 
 impl<'a> User<'a> {
@@ -17,18 +20,22 @@ impl<'a> User<'a> {
     /// If limit is not provided, it defaults to 50.
     pub async fn get_active_listings(
         &self,
-        wallets: Vec<String>,
+        wallet_address: String,
         sort_by: user_active_listings_query::ActiveListingsSortBy,
         cursor: Option<user_active_listings_query::ActiveListingsCursorInputV2>,
         mut limit: Option<i64>,
         slug: Option<String>,
-    ) -> Result<(), anyhow::Error> {
+    ) -> Result<UserActiveListings, anyhow::Error> {
         if limit.is_none() {
             limit = Some(50)
         };
 
+        // if let Some(collection_address) = collection_address {
+        //     collection_address
+        // };
+
         let query = UserActiveListingsQuery::build_query(user_active_listings_query::Variables {
-            wallets,
+            wallets: vec![wallet_address],
             sort_by,
             cursor,
             limit,
@@ -47,10 +54,8 @@ impl<'a> User<'a> {
         let response_body: Response<user_active_listings_query::ResponseData> =
             response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
-        dbg!(&response_body);
         if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
+            Ok(data.user_active_listings_v2)
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

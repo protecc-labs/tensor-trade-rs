@@ -4,15 +4,20 @@ use anyhow::Result;
 async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
-    let api_key = std::env::var("TENSOR_TRADE_API_KEY")?;
-    let client = tensor_trade::TensorTradeClient::new(&api_key)?;
+    let api_key =
+        std::env::var("TENSOR_TRADE_API_KEY").expect("tensor trade api key variable must be set");
+    let private_key = std::env::var("PRIVATE_KEY").expect("private key variable must be set");
+
+    let client = tensor_trade::TensorTradeClient::new(api_key, private_key, None)?;
+
+    // let user_wallet = "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA";
 
     // dbg!(
     //     client
-    //         .collection()
-    //         .get_slug("8zkfLBNFwo1SN13tDA6XE5VDXFDpG8jZLNo4pyCexFhP".to_string())
-    //         .await?
-    // );
+    //         .user()
+    //         .get_active_listings(wallets, sort_by, cursor, limit, slug)
+    //         .await
+    // );: &str
 
     // dbg!(
     //     client
@@ -111,9 +116,10 @@ async fn main() -> Result<()> {
 
     // dbg!(
     //     client
-    //         .get_users_active_listings(
-    //             vec!["CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string()],
-    //             tensor_trade_rs::types::queries::user_active_listings::user_active_listings_v2::ActiveListingsSortBy::PriceAsc,
+    //         .user()
+    //         .get_active_listings(
+    //             "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA".to_string(),
+    //             tensor_trade::ActiveListingsSortBy::PriceAsc,
     //             None,
     //             Some(1),
     //             None,
@@ -205,8 +211,8 @@ async fn main() -> Result<()> {
 
     dbg!(
         client
-            .tensorswap()
-            .get_delist_nft_tx(
+            .execute()
+            .delist(
                 "32aexhaNYWdaN8vpuUmk4YR1EN6jfQnWV2myekYYNyEN",
                 "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
             )

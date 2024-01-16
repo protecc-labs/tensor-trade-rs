@@ -124,9 +124,7 @@ impl<'a> Collection<'a> {
 
         let response_body: Response<collection_mints_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
 
-        dbg!(&response_body);
         if let Some(data) = response_body.data {
-            dbg!(&data);
             Ok(data.collection_mints_v2)
         } else {
             // Err(TensorTradeError::NoResponseData);

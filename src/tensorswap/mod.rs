@@ -3,7 +3,9 @@ use graphql_client::{GraphQLQuery, Response};
 
 use crate::tensorswap::queries::Decimal;
 
-use super::{constants, TensorTradeClient};
+use self::{queries::Byte, tswap_delist_nft_tx_query::TswapDelistNftTxTswapDelistNftTxTxs};
+
+use super::{constants::TENSOR_TRADE_API_URL, TensorTradeClient};
 
 mod queries;
 
@@ -38,7 +40,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -78,7 +80,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -134,7 +136,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -185,7 +187,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -230,7 +232,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -251,12 +253,16 @@ impl<'a> Tensorswap<'a> {
         }
     }
 
-    pub async fn get_delist_nft_tx(&self, mint: &str, owner: &str) -> anyhow::Result<()> {
+    pub async fn get_delist_nft_tx(
+        &self,
+        mint: &str,
+        owner: &str,
+    ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
         let slug = self.0.collection().get_slug(mint.into()).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot delist compressed NFTs - use tcomp delist instead");
-            return Ok(());
+            return Ok(None);
         }
 
         let query = TswapDelistNftTxQuery::build_query(tswap_delist_nft_tx_query::Variables {
@@ -267,7 +273,7 @@ impl<'a> Tensorswap<'a> {
         let response = self
             .0
             .client
-            .post(constants::TENSOR_TRADE_API_URL)
+            .post(TENSOR_TRADE_API_URL)
             .json(&query)
             .send()
             .await?;
@@ -279,8 +285,10 @@ impl<'a> Tensorswap<'a> {
         dbg!(&response_body);
 
         if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
+            let txs = data.tswap_delist_nft_tx.txs[0].clone();
+            let tx = txs.tx;
+            let tx_v0 = txs.tx_v0;
+            Ok(Some((tx, tx_v0)))
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

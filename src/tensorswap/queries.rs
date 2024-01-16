@@ -1,16 +1,16 @@
 use graphql_client::GraphQLQuery;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Decimal(pub String);
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Timestamp(pub i64);
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct BigInt(pub String);
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Byte {
     #[serde(with = "serde_bytes")]
     pub data: Vec<u8>,
@@ -20,7 +20,7 @@ pub struct Byte {
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tensorswap_active_orders.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TensorSwapActiveOrders;
 
@@ -28,7 +28,7 @@ pub struct TensorSwapActiveOrders;
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_buy_nft_tx.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TswapBuyNftTx;
 
@@ -36,7 +36,7 @@ pub struct TswapBuyNftTx;
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_buy_single_listing_tx.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TswapBuySingleListingTx;
 
@@ -44,7 +44,7 @@ pub struct TswapBuySingleListingTx;
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_list_nft_tx.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TswapListNftTx;
 
@@ -52,7 +52,7 @@ pub struct TswapListNftTx;
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_edit_single_listing_tx.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TswapEditSingleListingTx;
 
@@ -60,6 +60,6 @@ pub struct TswapEditSingleListingTx;
 #[graphql(
     schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_delist_nft_tx.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct TswapDelistNftTx;

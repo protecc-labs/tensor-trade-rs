@@ -125,6 +125,36 @@ impl<'a> Execute<'a> {
         Ok(true)
     }
 
+    // Sell to a pool immediately.
+    // It executes a delist transaction before it executes a sell now transaction.
+    pub async fn sell_now(
+        &self,
+        seller: String,
+        token_mint: String,
+    ) -> Result<bool, anyhow::Error> {
+        self.delist(&token_mint, &seller).await?;
+
+        let (_, tx_v0) = self
+            .0
+            .tensorswap()
+            .get_sell_now_tx(seller, token_mint)
+            .await?
+            .unwrap();
+        let tx_v0 = tx_v0.data;
+
+        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
+        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+
+        let signature = self
+            .0
+            .utils()
+            .execute_transaction(signed_transaction)
+            .await?;
+        dbg!(signature);
+
+        Ok(true)
+    }
+
     // IMPORTANT: Price is in Solana lamports (1e9 SOL).
     pub async fn list(
         &self,

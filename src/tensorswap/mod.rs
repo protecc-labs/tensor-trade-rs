@@ -15,12 +15,12 @@ pub(crate) use queries::{
     tswap_buy_single_listing_tx as tswap_buy_single_listing_tx_query,
     tswap_delist_nft_tx as tswap_delist_nft_tx_query,
     tswap_edit_single_listing_tx as tswap_edit_single_listing_tx_query,
-    tswap_list_nft_tx as tswap_list_nft_tx_query, TakeBidTx as TakeBidTxQuery,
-    TensorSwapActiveOrders as TensorswapActiveOrdersQuery, TswapBuyNftTx as TswapBuyNftTxQuery,
-    TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+    tswap_list_nft_tx as tswap_list_nft_tx_query, tswap_sell_nft_tx as tswap_sell_nft_tx_query,
+    TakeBidTx as TakeBidTxQuery, TensorSwapActiveOrders as TensorswapActiveOrdersQuery,
+    TswapBuyNftTx as TswapBuyNftTxQuery, TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
     TswapDelistNftTx as TswapDelistNftTxQuery,
     TswapEditSingleListingTx as TswapEditSingleListingTxQuery,
-    TswapListNftTx as TswapListNftTxQuery,
+    TswapListNftTx as TswapListNftTxQuery, TswapSellNftTx as TswapSellNftTxQuery,
 };
 
 pub struct Tensorswap<'a>(pub(crate) &'a TensorTradeClient);
@@ -150,6 +150,65 @@ impl<'a> Tensorswap<'a> {
 
         if let Some(data) = response_body.data {
             let txs = data.tswap_buy_nft_tx.txs[0].clone();
+            let tx = txs.tx;
+            let tx_v0 = txs.tx_v0;
+            Ok(Some((tx, tx_v0)))
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
+    }
+
+    // It automatically selects the first order/pool (highest price) to sell to.
+    pub async fn get_sell_now_tx(
+        &self,
+        seller: String,
+        mint: String,
+    ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
+        let slug = self.0.collection().get_slug(mint.clone()).await?;
+
+        if self.0.collection().is_compressed(slug.clone()).await? {
+            eprintln!("cannot sell compressed NFTs - use tcomp buy instead");
+            return Ok(None);
+        }
+
+        let active_orders = self.get_active_orders(slug).await?;
+        // If there are no active orders, return an error.
+        let highest_price_order = active_orders.get(0).unwrap().clone(); // TODO: Handle no orders.
+
+        let min_price_lamports = highest_price_order.sell_now_price.unwrap().clone();
+        let pool = highest_price_order.address.clone();
+        let buyer = highest_price_order.owner_address.clone();
+
+        dbg!(&min_price_lamports);
+        dbg!(&pool);
+        dbg!(&buyer);
+
+        let query = TswapSellNftTxQuery::build_query(tswap_sell_nft_tx_query::Variables {
+            min_price_lamports,
+            mint,
+            pool,
+            seller,
+            seller_token_account: None,
+        });
+
+        let response = self
+            .0
+            .client
+            .post(TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+
+        // .map(|response| response.error_for_status())??;
+        // dbg!(&response.json().await?.data);
+        let response_body: Response<tswap_sell_nft_tx_query::ResponseData> =
+            response.json().await?;
+        // This error should be because of deserialization, not because of the HTTP request.
+
+        if let Some(data) = response_body.data {
+            let txs = data.tswap_sell_nft_tx.txs[0].clone();
             let tx = txs.tx;
             let tx_v0 = txs.tx_v0;
             Ok(Some((tx, tx_v0)))

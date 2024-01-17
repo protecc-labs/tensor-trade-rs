@@ -224,46 +224,46 @@ impl<'a> Collection<'a> {
         }
     }
 
-    // pub async fn get_active_bids(
-    //     &self,
-    //     mint: String,
-    //     mut sort_by: Option<mint_query::OrderSortBy>,
-    //     mut limit: Option<i64>,
-    // ) -> anyhow::Result<()> {
-    //     if sort_by.is_none() {
-    //         sort_by = Some(mint_query::OrderSortBy::SellNowPriceDesc)
-    //     };
-    //     if limit.is_none() {
-    //         limit = Some(100)
-    //     };
+    pub async fn get_active_bids(
+        &self,
+        mint: String,
+        mut sort_by: Option<mint_query::OrderSortBy>,
+        mut limit: Option<i64>,
+    ) -> anyhow::Result<()> {
+        if sort_by.is_none() {
+            sort_by = Some(mint_query::OrderSortBy::SellNowPriceDesc)
+        };
+        if limit.is_none() {
+            limit = Some(100)
+        };
 
-    //     let query = MintQuery::build_query(mint_query::Variables {
-    //         mint,
-    //         sort_by,
-    //         limit,
-    //     });
+        let query = MintQuery::build_query(mint_query::Variables {
+            mint,
+            sort_by,
+            limit,
+        });
 
-    //     let response = self
-    //         .0
-    //         .client
-    //         .post(constants::TENSOR_TRADE_API_URL)
-    //         .json(&query)
-    //         .send()
-    //         .await?;
-    //     // .map(|response| response.error_for_status())??;
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
 
-    //     let response_body: Response<mint_query::ResponseData> = response.json().await?;
+        let response_body: Response<mint_query::ResponseData> = response.json().await?;
 
-    //     if let Some(data) = response_body.data {
-    //         let mint_mint = data.mint;
-    //         dbg!(&mint_mint);
-    //         Ok(())
-    //     } else {
-    //         // Err(TensorTradeError::NoResponseData);
-    //         eprintln!("no response data");
-    //         todo!()
-    //     }
+        if let Some(data) = response_body.data {
+            let mint_mint = data.mint;
+            dbg!(&mint_mint);
+            Ok(())
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
+        }
 
-    //     // todo!()
-    // }
+        // todo!()
+    }
 }

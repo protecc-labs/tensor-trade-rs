@@ -225,16 +225,15 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
-    // dbg!(
-    //     client
-    //         .collection()
-    //         .get_active_bids(
-    //             "H9pYtMYYM2JaMqcHRqi5aTzed2Xh2M8qwiqK5LBqabP1".to_string(),
-    //             None,
-    //             None,
-    //         )
-    //         .await?
-    // );
+    dbg!(
+        client
+            .execute()
+            .sell_now(
+                user_wallet.to_string(),
+                "H9pYtMYYM2JaMqcHRqi5aTzed2Xh2M8qwiqK5LBqabP1".to_string()
+            )
+            .await?
+    );
 
     Ok(())
 }

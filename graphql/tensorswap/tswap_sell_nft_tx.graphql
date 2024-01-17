@@ -1,0 +1,21 @@
+query TswapSellNftTx(
+  $minPriceLamports: Decimal!
+  $mint: String!
+  $pool: String!
+  $seller: String!
+  $sellerTokenAccount: String
+) {
+  tswapSellNftTx(
+    minPriceLamports: $minPriceLamports
+    mint: $mint
+    pool: $pool
+    seller: $seller
+    sellerTokenAccount: $sellerTokenAccount
+  ) {
+    txs {
+      lastValidBlockHeight
+      tx
+      txV0
+    }
+  }
+}

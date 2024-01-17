@@ -35,6 +35,14 @@ pub struct TswapBuyNftTx;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "graphql/schema.json",
+    query_path = "graphql/tensorswap/tswap_sell_nft_tx.graphql",
+    response_derives = "Debug, Clone"
+)]
+pub struct TswapSellNftTx;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
     query_path = "graphql/tensorswap/tswap_buy_single_listing_tx.graphql",
     response_derives = "Debug, Clone"
 )]

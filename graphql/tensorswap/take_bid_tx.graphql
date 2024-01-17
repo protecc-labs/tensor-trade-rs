@@ -1,0 +1,14 @@
+query TakeBidTx(
+  $bidder: String!
+  $mint: String!
+  $price: Decimal!
+  $seller: String!
+) {
+  takeBidTx(bidder: $bidder, mint: $mint, price: $price, seller: $seller) {
+    txs {
+      lastValidBlockHeight
+      tx
+      txV0
+    }
+  }
+}

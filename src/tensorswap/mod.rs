@@ -10,12 +10,12 @@ use super::{constants::TENSOR_TRADE_API_URL, TensorTradeClient};
 mod queries;
 
 pub(crate) use queries::{
-    tensor_swap_active_orders as tensorswap_active_orders_query,
+    take_bid_tx as take_bid_tx_query, tensor_swap_active_orders as tensorswap_active_orders_query,
     tswap_buy_nft_tx as tswap_buy_nft_tx_query,
     tswap_buy_single_listing_tx as tswap_buy_single_listing_tx_query,
     tswap_delist_nft_tx as tswap_delist_nft_tx_query,
     tswap_edit_single_listing_tx as tswap_edit_single_listing_tx_query,
-    tswap_list_nft_tx as tswap_list_nft_tx_query,
+    tswap_list_nft_tx as tswap_list_nft_tx_query, TakeBidTx as TakeBidTxQuery,
     TensorSwapActiveOrders as TensorswapActiveOrdersQuery, TswapBuyNftTx as TswapBuyNftTxQuery,
     TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
     TswapDelistNftTx as TswapDelistNftTxQuery,
@@ -303,4 +303,43 @@ impl<'a> Tensorswap<'a> {
             todo!()
         }
     }
+
+    // pub async fn get_take_bid_tx(
+    //     &self,
+    //     bidder: String,
+    //     mint: String,
+    //     price: String,
+    //     seller: String,
+    // ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
+    //     let query = TakeBidTxQuery::build_query(take_bid_tx_query::Variables {
+    //         bidder,
+    //         mint,
+    //         price: Decimal(price),
+    //         seller,
+    //     });
+
+    //     let response = self
+    //         .0
+    //         .client
+    //         .post(TENSOR_TRADE_API_URL)
+    //         .json(&query)
+    //         .send()
+    //         .await?;
+    //     // .map(|response| response.error_for_status())??;
+
+    //     let response_body: Response<tswap_buy_single_listing_tx_query::ResponseData> =
+    //         response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+    //     dbg!(&response_body);
+
+    //     if let Some(data) = response_body.data {
+    //         let txs = data.tswap_buy_single_listing_tx.txs[0].clone();
+    //         let tx = txs.tx;
+    //         let tx_v0 = txs.tx_v0;
+    //         Ok(Some((tx, tx_v0)))
+    //     } else {
+    //         // Err(TensorTradeError::NoResponseData);
+    //         eprintln!("no response data");
+    //         todo!()
+    //     }
+    // }
 }

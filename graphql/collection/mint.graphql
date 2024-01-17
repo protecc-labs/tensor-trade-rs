@@ -1,0 +1,53 @@
+query Mint($mint: String!, $sortBy: OrderSortBy, $limit: Int) {
+  mint(mint: $mint) {
+    slug
+    tswapOrders(sortBy: $sortBy, limit: $limit) {
+      address
+      ownerAddress
+      buyNowPrice
+      sellNowPrice # Pass this to tswapSellNftTx!
+      sellNowPriceNetFees
+      feeInfos {
+        bps
+        kind
+      }
+      nftsForSale {
+        onchainId
+      }
+    }
+    tensorBids(sortBy: $sortBy, limit: $limit) {
+      bidder
+      expiry
+      price
+    }
+    hswapOrders {
+      address
+      assetReceiver
+      baseSpotPrice
+      boxes {
+        mint {
+          onchainId
+        }
+      }
+      buyOrdersQuantity
+      createdAt
+      curveType
+      delta
+      feeBps
+      fundsSolOrTokenBalance
+      lastTransactedAt
+      mathCounter
+      pairType
+    }
+    activeListings {
+      mint {
+        onchainId
+      }
+      tx {
+        sellerId
+        grossAmount
+        grossAmountUnit
+      }
+    }
+  }
+}

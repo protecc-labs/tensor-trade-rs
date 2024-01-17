@@ -49,3 +49,11 @@ pub struct MintList;
     response_derives = "Debug, Clone"
 )]
 pub struct ActiveListingsV2;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
+    query_path = "graphql/collection/mint.graphql",
+    response_derives = "Debug, Clone"
+)]
+pub struct Mint;

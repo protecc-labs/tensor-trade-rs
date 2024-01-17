@@ -215,15 +215,26 @@ async fn main() -> Result<()> {
     //         .get_slug("22PjPyr7FyBrc9yojcneCG3CVfXgMsFF5PEMamPTQevZ".to_string())
     //         .await?
     // );
-    dbg!(
-        client
-            .execute()
-            .buy_order(
-                user_wallet.to_string(),
-                "9EMs564hEUL6Zf1RyDS9FzUEuJjpLNd2DPUT5X52p16B".to_string()
-            )
-            .await?
-    );
+    // dbg!(
+    //     client
+    //         .execute()
+    //         .buy_order(
+    //             user_wallet.to_string(),
+    //             "9EMs564hEUL6Zf1RyDS9FzUEuJjpLNd2DPUT5X52p16B".to_string()
+    //         )
+    //         .await?
+    // );
+
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_active_bids(
+    //             "H9pYtMYYM2JaMqcHRqi5aTzed2Xh2M8qwiqK5LBqabP1".to_string(),
+    //             None,
+    //             None,
+    //         )
+    //         .await?
+    // );
 
     Ok(())
 }

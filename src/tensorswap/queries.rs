@@ -63,3 +63,11 @@ pub struct TswapEditSingleListingTx;
     response_derives = "Debug, Clone"
 )]
 pub struct TswapDelistNftTx;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "graphql/schema.json",
+    query_path = "graphql/tensorswap/take_bid_tx.graphql",
+    response_derives = "Debug, Clone"
+)]
+pub struct TakeBidTx;

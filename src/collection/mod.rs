@@ -9,9 +9,10 @@ mod queries;
 
 pub(crate) use queries::{
     active_listings_v2 as active_listings_query, collection_mints as collection_mints_query,
-    collection_stats as collection_stats_query, mint_list as mint_list_query, mints as mints_query,
-    ActiveListingsV2 as ActiveListingsQuery, CollectionMints as CollectionMintsQuery,
-    CollectionStats as CollectionStatsQuery, MintList as MintListQuery, Mints as MintsQuery,
+    collection_stats as collection_stats_query, mint as mint_query, mint_list as mint_list_query,
+    mints as mints_query, ActiveListingsV2 as ActiveListingsQuery,
+    CollectionMints as CollectionMintsQuery, CollectionStats as CollectionStatsQuery,
+    Mint as MintQuery, MintList as MintListQuery, Mints as MintsQuery,
 };
 
 pub struct Collection<'a>(pub(crate) &'a TensorTradeClient);
@@ -222,4 +223,47 @@ impl<'a> Collection<'a> {
             todo!()
         }
     }
+
+    // pub async fn get_active_bids(
+    //     &self,
+    //     mint: String,
+    //     mut sort_by: Option<mint_query::OrderSortBy>,
+    //     mut limit: Option<i64>,
+    // ) -> anyhow::Result<()> {
+    //     if sort_by.is_none() {
+    //         sort_by = Some(mint_query::OrderSortBy::SellNowPriceDesc)
+    //     };
+    //     if limit.is_none() {
+    //         limit = Some(100)
+    //     };
+
+    //     let query = MintQuery::build_query(mint_query::Variables {
+    //         mint,
+    //         sort_by,
+    //         limit,
+    //     });
+
+    //     let response = self
+    //         .0
+    //         .client
+    //         .post(constants::TENSOR_TRADE_API_URL)
+    //         .json(&query)
+    //         .send()
+    //         .await?;
+    //     // .map(|response| response.error_for_status())??;
+
+    //     let response_body: Response<mint_query::ResponseData> = response.json().await?;
+
+    //     if let Some(data) = response_body.data {
+    //         let mint_mint = data.mint;
+    //         dbg!(&mint_mint);
+    //         Ok(())
+    //     } else {
+    //         // Err(TensorTradeError::NoResponseData);
+    //         eprintln!("no response data");
+    //         todo!()
+    //     }
+
+    //     // todo!()
+    // }
 }

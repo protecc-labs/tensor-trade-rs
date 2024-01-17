@@ -10,7 +10,7 @@ async fn main() -> Result<()> {
 
     let client = tensor_trade::TensorTradeClient::new(api_key, private_key, None)?;
 
-    // let user_wallet = "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA";
+    let user_wallet = "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA";
 
     // dbg!(
     //     client
@@ -212,10 +212,9 @@ async fn main() -> Result<()> {
     dbg!(
         client
             .execute()
-            .edit_listing(
-                "HjzZCm72jgy2LPyGmkRf6JhUBUH1v2egKBCGFVww1iCD",
-                "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA",
-                "30000000000"
+            .buy_listing(
+                user_wallet.to_string(),
+                "89q5wsiN34xbvYR8qzfTzctb6vE8U3BGrT8yyPWmKGx6".to_string()
             )
             .await?
     );

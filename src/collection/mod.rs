@@ -1,13 +1,16 @@
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
 
+use self::active_listings_query::{ActiveListingsFilters, ActiveListingsV2ActiveListingsV2Txs};
+
 use super::{constants, TensorTradeClient};
 
 mod queries;
 
 pub(crate) use queries::{
-    collection_mints as collection_mints_query, collection_stats as collection_stats_query,
-    mint_list as mint_list_query, mints as mints_query, CollectionMints as CollectionMintsQuery,
+    active_listings_v2 as active_listings_query, collection_mints as collection_mints_query,
+    collection_stats as collection_stats_query, mint_list as mint_list_query, mints as mints_query,
+    ActiveListingsV2 as ActiveListingsQuery, CollectionMints as CollectionMintsQuery,
     CollectionStats as CollectionStatsQuery, MintList as MintListQuery, Mints as MintsQuery,
 };
 
@@ -167,6 +170,7 @@ impl<'a> Collection<'a> {
         }
     }
 
+    // TODO: Move to `utils`?
     pub async fn is_compressed(&self, slug: String) -> anyhow::Result<bool> {
         let stats = self.get_stats(slug).await?;
 
@@ -174,6 +178,48 @@ impl<'a> Collection<'a> {
             Ok(stats.compressed)
         } else {
             Err(anyhow::anyhow!("no stats"))
+        }
+    }
+
+    pub async fn get_active_listings(
+        &self,
+        slug: String,
+        sort_by: active_listings_query::ActiveListingsSortBy,
+        filters: Option<ActiveListingsFilters>,
+        mut limit: Option<i64>,
+        cursor: Option<active_listings_query::ActiveListingsCursorInputV2>,
+    ) -> anyhow::Result<Vec<ActiveListingsV2ActiveListingsV2Txs>> {
+        if limit.is_none() {
+            limit = Some(100)
+        };
+
+        let query = ActiveListingsQuery::build_query(active_listings_query::Variables {
+            slug,
+            sort_by,
+            filters,
+            limit,
+            cursor,
+        });
+
+        let response = self
+            .0
+            .client
+            .post(constants::TENSOR_TRADE_API_URL)
+            .json(&query)
+            .send()
+            .await?;
+        // .map(|response| response.error_for_status())??;
+
+        let response_body: Response<active_listings_query::ResponseData> = response.json().await?; // This error should be because of deserialization, not because of the HTTP request.
+
+        dbg!(&response_body);
+        if let Some(data) = response_body.data {
+            dbg!(&data);
+            Ok(data.active_listings_v2.txs)
+        } else {
+            // Err(TensorTradeError::NoResponseData);
+            eprintln!("no response data");
+            todo!()
         }
     }
 }

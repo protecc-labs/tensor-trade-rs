@@ -64,14 +64,14 @@ impl<'a> Tensorswap<'a> {
     pub async fn get_buy_listing_tx(
         &self,
         buyer: String,
-        max_price: Decimal,
+        max_price: String,
         mint: String,
         owner: String,
-    ) -> Result<(), anyhow::Error> {
+    ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
         let query = TswapBuySingleListingTxQuery::build_query(
             tswap_buy_single_listing_tx_query::Variables {
                 buyer,
-                max_price,
+                max_price: Decimal(max_price),
                 mint,
                 owner,
             },
@@ -92,8 +92,10 @@ impl<'a> Tensorswap<'a> {
         dbg!(&response_body);
 
         if let Some(data) = response_body.data {
-            dbg!(&data);
-            Ok(())
+            let txs = data.tswap_buy_single_listing_tx.txs[0].clone();
+            let tx = txs.tx;
+            let tx_v0 = txs.tx_v0;
+            Ok(Some((tx, tx_v0)))
         } else {
             // Err(TensorTradeError::NoResponseData);
             eprintln!("no response data");

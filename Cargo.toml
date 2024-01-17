@@ -1,13 +1,14 @@
 [package]
 name = "tensor-trade"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["mektigboy <mektigboy@protonmail.com>"]
 description = "A client for Tensor NFT marketplace and its aggregated marketplaces."
 repository = "https://github.com/protecc-labs/tensor-trade-rs"
 license = "MIT"
-categories = ["graphql", "reqwest", "nft"]
-keywords = ["tensor", "tensorswap"]
+categories = ["api-bindings"]
+keywords = ["crypto", "api"]
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0.77"

@@ -1,9 +1,12 @@
+use std::thread::AccessError;
+
 use anyhow::Result;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::{
+    account::Account,
     message::VersionedMessage,
-    signature::{Keypair, Signature},
-    transaction::VersionedTransaction,
+    signature::{Keypair, Signature, Signer},
+    transaction::{self, VersionedTransaction},
 };
 
 use super::TensorTradeClient;
@@ -37,4 +40,16 @@ impl<'a> Utils<'a> {
 
         Ok(sig)
     }
+
+    // pub async fn get_this_account(&self) -> Result<Account, anyhow::Error> {
+    //     let keypair = Keypair::from_base58_string(&self.0.private_key);
+
+    //     let pubkey = keypair.pubkey();
+
+    //     let account = RpcClient::new(&self.0.rpc_url).get(&pubkey)?;
+
+    //     dbg!(&account.);
+
+    //     Ok(account)
+    // }
 }

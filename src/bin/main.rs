@@ -209,12 +209,18 @@ async fn main() -> Result<()> {
     //         .await?
     // );
 
+    // dbg!(
+    //     client
+    //         .collection()
+    //         .get_slug("22PjPyr7FyBrc9yojcneCG3CVfXgMsFF5PEMamPTQevZ".to_string())
+    //         .await?
+    // );
     dbg!(
         client
             .execute()
-            .buy_listing(
+            .buy_order(
                 user_wallet.to_string(),
-                "89q5wsiN34xbvYR8qzfTzctb6vE8U3BGrT8yyPWmKGx6".to_string()
+                "9EMs564hEUL6Zf1RyDS9FzUEuJjpLNd2DPUT5X52p16B".to_string()
             )
             .await?
     );

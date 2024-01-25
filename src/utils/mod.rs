@@ -4,6 +4,7 @@ use solana_sdk::{
     message::VersionedMessage,
     pubkey::Pubkey,
     signature::{Keypair, Signature},
+    signer::Signer,
     transaction::VersionedTransaction,
 };
 use std::str::FromStr;
@@ -13,6 +14,12 @@ use super::TensorTradeClient;
 pub struct Utils<'a>(pub(crate) &'a TensorTradeClient);
 
 impl<'a> Utils<'a> {
+    pub async fn get_this_account(&self) -> Result<Pubkey> {
+        let keypair = Keypair::from_base58_string(&self.0.private_key);
+
+        Ok(keypair.pubkey())
+    }
+
     pub async fn get_account_balance(&self, user_account: &str) -> Result<u64> {
         let rpc_client = RpcClient::new(&self.0.rpc_url);
         let user_account = Pubkey::from_str(user_account).unwrap();

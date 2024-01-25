@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use tensor_trade::TensorTradeClient;
+use tensor_trade::{Getters, TensorTradeClient};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -12,12 +12,7 @@ async fn main() -> Result<()> {
 
     let tensor_trade_client = TensorTradeClient::new(api_key, private_key, None)?;
 
-    let account = "CHrpFgkN89fcAMV8BcKpGS1RueJc4ZyoLy9xxdTtiQaA";
-    let account_balance = tensor_trade_client
-        .utils()
-        .get_account_balance(account)
-        .await
-        .unwrap();
+    let account_balance = tensor_trade_client.this_account().unwrap();
 
     println!("Account balance: {}", account_balance);
 

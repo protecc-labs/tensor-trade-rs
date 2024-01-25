@@ -1,4 +1,7 @@
+use anyhow::Result;
 use reqwest::header;
+use solana_client::rpc_client::RpcClient;
+use solana_sdk::{pubkey::Pubkey, signature::Keypair, signer::Signer};
 
 pub(crate) mod collection;
 pub(crate) mod execute;
@@ -82,5 +85,38 @@ impl TensorTradeClient {
 
     pub fn utils(&self) -> utils::Utils {
         utils::Utils(self)
+    }
+}
+
+pub trait Settings {
+    fn update_private_key(&mut self, private_key: String);
+
+    fn update_rpc_url(&mut self, rpc_url: String);
+}
+
+impl Settings for TensorTradeClient {
+    fn update_private_key(&mut self, private_key: String) {
+        self.private_key = private_key;
+    }
+
+    fn update_rpc_url(&mut self, rpc_url: String) {
+        self.rpc_url = rpc_url;
+    }
+}
+
+pub trait Getters {
+    fn this_account(&self) -> Result<Pubkey>;
+
+    fn this_balance(&self) -> Result<u64>;
+}
+impl Getters for TensorTradeClient {
+    fn this_account(&self) -> Result<Pubkey> {
+        Ok(Keypair::from_base58_string(&self.private_key).pubkey())
+    }
+
+    fn this_balance(&self) -> Result<u64> {
+        Ok(RpcClient::new(&self.rpc_url)
+            .get_account(&self.this_account()?)?
+            .lamports)
     }
 }

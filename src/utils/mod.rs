@@ -1,12 +1,9 @@
-use std::thread::AccessError;
-
 use anyhow::Result;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::{
-    account::Account,
     message::VersionedMessage,
-    signature::{Keypair, Signature, Signer},
-    transaction::{self, VersionedTransaction},
+    signature::{Keypair, Signature},
+    transaction::VersionedTransaction,
 };
 
 use super::TensorTradeClient;

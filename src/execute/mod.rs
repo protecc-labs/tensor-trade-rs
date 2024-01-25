@@ -49,7 +49,7 @@ impl<'a> Execute<'a> {
             .tensorswap()
             .get_buy_listing_tx(
                 buyer,
-                listing.gross_amount.unwrap().into(),
+                listing.gross_amount.unwrap().0,
                 token_mint,
                 listing.seller_id.unwrap(),
             )
@@ -95,8 +95,9 @@ impl<'a> Execute<'a> {
 
         // Buy price is in lamports (1e9 SOL).
         let buy_price = order.buy_now_price.clone().unwrap();
-        let buy_price: Result<f64, _> = buy_price.into();
-        let buy_price = buy_price.unwrap();
+
+        let buy_price = buy_price.0.parse::<f64>().unwrap();
+
         dbg!(&buy_price);
         let mm_fee_bps = order.mm_fee_bps.unwrap() as f64;
         dbg!(&mm_fee_bps);

@@ -2,15 +2,24 @@ use anyhow::Result;
 use solana_client::rpc_client::RpcClient;
 use solana_sdk::{
     message::VersionedMessage,
+    pubkey::Pubkey,
     signature::{Keypair, Signature},
     transaction::VersionedTransaction,
 };
+use std::str::FromStr;
 
 use super::TensorTradeClient;
 
 pub struct Utils<'a>(pub(crate) &'a TensorTradeClient);
 
 impl<'a> Utils<'a> {
+    pub async fn get_account_balance(&self, user_account: &str) -> Result<u64> {
+        let rpc_client = RpcClient::new(&self.0.rpc_url);
+        let user_account = Pubkey::from_str(user_account).unwrap();
+
+        Ok(rpc_client.get_account(&user_account).unwrap().lamports)
+    }
+
     pub async fn sign_transaction(
         &self,
         mut transaction_message: VersionedMessage,

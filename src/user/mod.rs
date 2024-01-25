@@ -1,5 +1,6 @@
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
+
 use std::vec;
 
 use super::{constants, TensorTradeClient};

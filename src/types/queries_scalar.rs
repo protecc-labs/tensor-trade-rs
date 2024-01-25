@@ -16,14 +16,14 @@ impl From<Decimal> for String {
     }
 }
 
-impl From<Decimal> for Result<f64, ParseFloatError> {
-    fn from(decimal: Decimal) -> Self {
-        decimal.0.parse::<f64>()
-    }
-}
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Timestamp(i64);
+
+impl Timestamp {
+    pub fn new(timestamp: i64) -> Self {
+        Self(timestamp)
+    }
+}
 
 impl From<Timestamp> for i64 {
     fn from(timestamp: Timestamp) -> Self {
@@ -33,6 +33,12 @@ impl From<Timestamp> for i64 {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BigInt(String);
+
+impl BigInt {
+    pub fn new(big_int: String) -> Self {
+        Self(big_int)
+    }
+}
 
 impl From<BigInt> for String {
     fn from(big_int: BigInt) -> Self {

@@ -1,14 +1,6 @@
 use graphql_client::GraphQLQuery;
-use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
-pub struct Decimal(pub String);
-
-#[derive(Debug, Deserialize)]
-pub struct Timestamp(pub i64);
-
-#[derive(Debug, Deserialize)]
-pub struct BigInt(pub String);
+use crate::types::queries_scalar::{BigInt, Decimal, Timestamp};
 
 #[derive(GraphQLQuery)]
 #[graphql(

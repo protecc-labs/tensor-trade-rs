@@ -1,9 +1,9 @@
 use reqwest::header;
-use solana_client::rpc_client;
 
 pub(crate) mod collection;
 pub(crate) mod execute;
 pub(crate) mod tensorswap;
+pub(crate) mod types;
 pub(crate) mod user;
 pub(crate) mod utils;
 
@@ -25,8 +25,6 @@ pub struct TensorTradeClient {
     pub(crate) client: reqwest::Client,
     pub(crate) private_key: String,
     pub(crate) rpc_url: String,
-    // pub(crate) signer: solana_sdk::signature::Keypair,
-    // pub(crate) rpc_client: solana_client::rpc_client::RpcClient,
 }
 
 impl TensorTradeClient {

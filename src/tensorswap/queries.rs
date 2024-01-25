@@ -1,20 +1,6 @@
 use graphql_client::GraphQLQuery;
-use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Decimal(pub String);
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct Timestamp(pub i64);
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct BigInt(pub String);
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct Byte {
-    #[serde(with = "serde_bytes")]
-    pub data: Vec<u8>,
-}
+use crate::types::queries_scalar::{BigInt, Byte, Decimal, Timestamp};
 
 #[derive(GraphQLQuery)]
 #[graphql(

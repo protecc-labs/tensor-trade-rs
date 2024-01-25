@@ -1,9 +1,7 @@
 use anyhow::Result;
 use graphql_client::{GraphQLQuery, Response};
 
-use crate::tensorswap::queries::Decimal;
-
-use self::queries::Byte;
+use crate::types::queries_scalar::{Byte, Decimal};
 
 use super::{constants::TENSOR_TRADE_API_URL, TensorTradeClient};
 
@@ -71,7 +69,7 @@ impl<'a> Tensorswap<'a> {
         let query = TswapBuySingleListingTxQuery::build_query(
             tswap_buy_single_listing_tx_query::Variables {
                 buyer,
-                max_price: Decimal(max_price),
+                max_price: Decimal::new(max_price),
                 mint,
                 owner,
             },
@@ -130,7 +128,7 @@ impl<'a> Tensorswap<'a> {
 
         let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
             buyer,
-            max_price_lamports: Decimal(max_price_lamports),
+            max_price_lamports: Decimal::new(max_price_lamports),
             mint,
             pool: address.to_string(),
         });
@@ -244,7 +242,7 @@ impl<'a> Tensorswap<'a> {
         let query = TswapListNftTxQuery::build_query(tswap_list_nft_tx_query::Variables {
             mint: mint.into(),
             owner: owner.into(),
-            price: Decimal(price.into()),
+            price: Decimal::new(price.into()),
         });
 
         let response = self
@@ -290,7 +288,7 @@ impl<'a> Tensorswap<'a> {
             tswap_edit_single_listing_tx_query::Variables {
                 mint: mint.into(),
                 owner: owner.into(),
-                price: Decimal(price.into()),
+                price: Decimal::new(price.into()),
             },
         );
 

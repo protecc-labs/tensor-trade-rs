@@ -22,7 +22,7 @@ impl<'a> Collection<'a> {
     pub async fn get_stats(
         &self,
         slug: String,
-    ) -> Result<Option<collection_stats_query::CollectionStatsInstrumentTv2>, anyhow::Error> {
+    ) -> Result<Option<queries::collection_stats::CollectionStatsInstrumentTv2>> {
         let query = CollectionStatsQuery::build_query(collection_stats_query::Variables { slug });
 
         let response = self

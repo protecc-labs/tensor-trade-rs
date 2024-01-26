@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use tensor_trade::{Getters, TensorTradeClient};
+use tensor_trade::TensorTradeClient;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -12,9 +12,12 @@ async fn main() -> Result<()> {
 
     let tensor_trade_client = TensorTradeClient::new(api_key, private_key, None)?;
 
-    let account = tensor_trade_client.this_account();
+    let signature = tensor_trade_client
+        .execute()
+        .buy_listing("EEp26HaWWp5JPr1TazUXRmGnDhUVNFa2pjWYD4QhQFFp")
+        .await?;
 
-    println!("Account: {}", account);
+    println!("Signature: {}", signature);
 
     Ok(())
 }

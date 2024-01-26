@@ -12,9 +12,9 @@ async fn main() -> Result<()> {
 
     let tensor_trade_client = TensorTradeClient::new(api_key, private_key, None)?;
 
-    let account_balance = tensor_trade_client.this_balance().unwrap();
+    let balance = tensor_trade_client.this_balance().unwrap();
 
-    println!("Account balance: {}", account_balance);
+    println!("Balance: {}", balance);
 
     Ok(())
 }

@@ -1,19 +1,15 @@
-use anyhow::Ok;
-use solana_sdk::transaction::VersionedTransaction;
+use anyhow::Result;
+use solana_sdk::signature::Signature;
 
 use crate::collection::active_listings_query;
 
-use super::TensorTradeClient;
+use super::{utils, Getters, TensorTradeClient};
 
 pub struct Execute<'a>(pub(crate) &'a TensorTradeClient);
 
 impl<'a> Execute<'a> {
-    pub async fn buy_listing(
-        &self,
-        buyer: String,
-        token_mint: String,
-    ) -> Result<bool, anyhow::Error> {
-        let slug = self.0.collection().get_slug(token_mint.clone()).await?;
+    pub async fn buy_listing(&self, token_address: &str) -> Result<Signature> {
+        let slug = self.0.collection().get_slug(token_address.into()).await?;
 
         let active_listings = self
             .0
@@ -30,7 +26,7 @@ impl<'a> Execute<'a> {
         // Find the active listing equal to the token mint.
         let listing = active_listings
             .iter()
-            .find(|listing| listing.mint.onchain_id == token_mint);
+            .find(|listing| listing.mint.onchain_id == token_address);
 
         if let None = listing {
             return Err(anyhow::anyhow!("no listing"));
@@ -42,7 +38,7 @@ impl<'a> Execute<'a> {
 
         let listing = listing.clone().tx;
 
-        // let buyer = self.0.utils().get_this_account().await?;
+        let buyer = self.0.this_account().to_string();
 
         let (_, tx_v0) = self
             .0
@@ -50,32 +46,25 @@ impl<'a> Execute<'a> {
             .get_buy_listing_tx(
                 buyer,
                 listing.gross_amount.unwrap().0,
-                token_mint,
+                token_address.into(),
                 listing.seller_id.unwrap(),
             )
             .await?
             .unwrap();
         let tx_v0 = tx_v0.data;
 
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
 
-        let signature = self
-            .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
-
-        Ok(true)
+        Ok(signature)
     }
 
-    pub async fn buy_order(
-        &self,
-        buyer: String,
-        token_mint: String,
-    ) -> Result<bool, anyhow::Error> {
-        let slug = self.0.collection().get_slug(token_mint.clone()).await?;
+    pub async fn buy_order(&self, token_address: &str) -> Result<Signature> {
+        let buyer = self.0.this_account().to_string();
+
+        let slug = self.0.collection().get_slug(token_address).await?;
 
         let active_orders = self.0.tensorswap().get_active_orders(slug).await?;
 
@@ -83,7 +72,7 @@ impl<'a> Execute<'a> {
             order
                 .nfts_for_sale
                 .iter()
-                .find(|nft_for_sale| nft_for_sale.onchain_id == token_mint)
+                .find(|nft_for_sale| nft_for_sale.onchain_id == token_address)
                 .is_some()
         });
 
@@ -109,129 +98,100 @@ impl<'a> Execute<'a> {
         let (_, tx_v0) = self
             .0
             .tensorswap()
-            .get_buy_order_tx(buyer, gross_amount_lamports.to_string(), token_mint)
+            .get_buy_order_tx(&buyer, &gross_amount_lamports.to_string(), &token_address)
             .await?
             .unwrap();
         let tx_v0 = tx_v0.data;
 
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
 
-        let signature = self
-            .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
-
-        Ok(true)
+        Ok(signature)
     }
 
     // Sell to a pool immediately.
     // It executes a delist transaction before it executes a sell now transaction.
-    pub async fn sell_now(
-        &self,
-        seller: String,
-        token_mint: String,
-    ) -> Result<bool, anyhow::Error> {
-        self.delist(&token_mint, &seller).await?;
+    pub async fn sell_now(&self, token_address: &str) -> Result<Signature> {
+        let seller = self.0.this_account().to_string();
+
+        // Check if the token is listed.
+        // If so, delist it.
+        // self.delist(token_mint).await?;
 
         let (_, tx_v0) = self
             .0
             .tensorswap()
-            .get_sell_now_tx(seller, token_mint)
+            .get_sell_now_tx(&seller, token_address.into())
             .await?
             .unwrap();
         let tx_v0 = tx_v0.data;
 
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
 
-        let signature = self
+        Ok(signature)
+    }
+
+    // IMPORTANT: Price is in lamports (1e9 SOL).
+    pub async fn list(&self, token_address: &str, price: &str) -> Result<Signature> {
+        let owner = self.0.this_account().to_string();
+
+        let (_, tx_v0) = self
             .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
+            .tensorswap()
+            .get_list_nft_tx(token_address, &owner, price)
+            .await?
+            .unwrap();
+        let tx_v0 = tx_v0.data;
 
-        Ok(true)
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
+
+        Ok(signature)
     }
 
     // IMPORTANT: Price is in Solana lamports (1e9 SOL).
-    pub async fn list(
-        &self,
-        token_mint: &str,
-        owner: &str,
-        price: &str,
-    ) -> Result<bool, anyhow::Error> {
+    pub async fn edit_listing(&self, token_address: &str, price: &str) -> Result<Signature> {
+        let owner = self.0.this_account().to_string();
+
         let (_, tx_v0) = self
             .0
             .tensorswap()
-            .get_list_nft_tx(token_mint, owner, price)
+            .get_edit_listing_tx(token_address, &owner, price)
             .await?
             .unwrap();
         let tx_v0 = tx_v0.data;
 
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
 
-        let signature = self
-            .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
-
-        Ok(true)
+        Ok(signature)
     }
 
-    // IMPORTANT: Price is in Solana lamports (1e9 SOL).
-    pub async fn edit_listing(
-        &self,
-        token_mint: &str,
-        owner: &str,
-        price: &str,
-    ) -> Result<bool, anyhow::Error> {
+    pub async fn delist(&self, token_address: &str) -> Result<Signature> {
+        let owner = self.0.this_account().to_string();
+
         let (_, tx_v0) = self
             .0
             .tensorswap()
-            .get_edit_listing_tx(token_mint, owner, price)
+            .get_delist_nft_tx(&owner, token_address)
             .await?
             .unwrap();
         let tx_v0 = tx_v0.data;
 
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
+        let message = bincode::deserialize(&tx_v0).unwrap();
+        let signature =
+            utils::sing_and_execute_transaction(&self.0.rpc_url, &self.0.private_key, message)
+                .await?;
 
-        let signature = self
-            .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
-
-        Ok(true)
-    }
-
-    pub async fn delist(&self, token_mint: &str, owner: &str) -> Result<bool, anyhow::Error> {
-        let (_, tx_v0) = self
-            .0
-            .tensorswap()
-            .get_delist_nft_tx(token_mint, owner)
-            .await?
-            .unwrap();
-        let tx_v0 = tx_v0.data;
-
-        let transaction: VersionedTransaction = bincode::deserialize(&tx_v0).unwrap();
-        let signed_transaction = self.0.utils().sign_transaction(transaction.message).await?;
-
-        let signature = self
-            .0
-            .utils()
-            .execute_transaction(signed_transaction)
-            .await?;
-        dbg!(signature);
-
-        Ok(true)
+        Ok(signature)
     }
 }

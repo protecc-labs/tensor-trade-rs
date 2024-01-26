@@ -138,9 +138,9 @@ impl<'a> Collection<'a> {
     }
 
     // Get the slug for a collection with any token mint in it.
-    pub async fn get_slug(&self, token_mint: String) -> anyhow::Result<String> {
+    pub async fn get_slug(&self, token_address: &str) -> anyhow::Result<String> {
         let query = MintsQuery::build_query(mints_query::Variables {
-            token_mints: vec![token_mint],
+            token_mints: vec![token_address.into()],
         });
 
         let response = self

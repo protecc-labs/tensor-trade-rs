@@ -64,11 +64,11 @@ impl<'a> User<'a> {
         }
     }
 
-    async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error> {
-        todo!()
-    }
+    // async fn get_user_tensorswap_active_orders(&self, wallet: String) -> Result<(), anyhow::Error> {
+    //     todo!()
+    // }
 
-    async fn get_user_tcomp_active_bids(&self, wallet: String) -> Result<(), anyhow::Error> {
-        todo!()
-    }
+    // async fn get_user_tcomp_active_bids(&self, wallet: String) -> Result<(), anyhow::Error> {
+    //     todo!()
+    // }
 }

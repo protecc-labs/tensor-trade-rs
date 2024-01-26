@@ -8,7 +8,7 @@ pub(crate) mod execute;
 pub(crate) mod tensorswap;
 pub(crate) mod types;
 pub(crate) mod user;
-pub(crate) mod utils;
+pub mod utils;
 
 mod constants;
 
@@ -82,10 +82,6 @@ impl TensorTradeClient {
     pub fn execute(&self) -> execute::Execute {
         execute::Execute(self)
     }
-
-    pub fn utils(&self) -> utils::Utils {
-        utils::Utils(self)
-    }
 }
 
 pub trait Settings {
@@ -105,18 +101,18 @@ impl Settings for TensorTradeClient {
 }
 
 pub trait Getters {
-    fn this_account(&self) -> Result<Pubkey>;
+    fn this_account(&self) -> Pubkey;
 
     fn this_balance(&self) -> Result<u64>;
 }
 impl Getters for TensorTradeClient {
-    fn this_account(&self) -> Result<Pubkey> {
-        Ok(Keypair::from_base58_string(&self.private_key).pubkey())
+    fn this_account(&self) -> Pubkey {
+        Keypair::from_base58_string(&self.private_key).pubkey()
     }
 
     fn this_balance(&self) -> Result<u64> {
         Ok(RpcClient::new(&self.rpc_url)
-            .get_account(&self.this_account()?)?
+            .get_account(&self.this_account())?
             .lamports)
     }
 }

@@ -8,14 +8,14 @@ use super::{constants::TENSOR_TRADE_API_URL, TensorTradeClient};
 mod queries;
 
 pub(crate) use queries::{
-    take_bid_tx as take_bid_tx_query, tensor_swap_active_orders as tensorswap_active_orders_query,
+    tensor_swap_active_orders as tensorswap_active_orders_query,
     tswap_buy_nft_tx as tswap_buy_nft_tx_query,
     tswap_buy_single_listing_tx as tswap_buy_single_listing_tx_query,
     tswap_delist_nft_tx as tswap_delist_nft_tx_query,
     tswap_edit_single_listing_tx as tswap_edit_single_listing_tx_query,
     tswap_list_nft_tx as tswap_list_nft_tx_query, tswap_sell_nft_tx as tswap_sell_nft_tx_query,
-    TakeBidTx as TakeBidTxQuery, TensorSwapActiveOrders as TensorswapActiveOrdersQuery,
-    TswapBuyNftTx as TswapBuyNftTxQuery, TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
+    TensorSwapActiveOrders as TensorswapActiveOrdersQuery, TswapBuyNftTx as TswapBuyNftTxQuery,
+    TswapBuySingleListingTx as TswapBuySingleListingTxQuery,
     TswapDelistNftTx as TswapDelistNftTxQuery,
     TswapEditSingleListingTx as TswapEditSingleListingTxQuery,
     TswapListNftTx as TswapListNftTxQuery, TswapSellNftTx as TswapSellNftTxQuery,
@@ -103,11 +103,11 @@ impl<'a> Tensorswap<'a> {
 
     pub async fn get_buy_order_tx(
         &self,
-        buyer: String,
-        max_price_lamports: String,
-        mint: String,
+        buyer: &str,
+        max_price_lamports: &str,
+        token_address: &str,
     ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
-        let slug = self.0.collection().get_slug(mint.clone()).await?;
+        let slug = self.0.collection().get_slug(token_address).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot buy compressed NFTs - use tcomp buy instead");
@@ -121,15 +121,10 @@ impl<'a> Tensorswap<'a> {
 
         let address = &active_orders.get(0).unwrap().address;
 
-        dbg!(&buyer);
-        dbg!(&max_price_lamports);
-        dbg!(&mint);
-        dbg!(&address);
-
         let query = TswapBuyNftTxQuery::build_query(tswap_buy_nft_tx_query::Variables {
-            buyer,
-            max_price_lamports: Decimal::new(max_price_lamports),
-            mint,
+            buyer: buyer.into(),
+            max_price_lamports: Decimal::new(max_price_lamports.into()),
+            mint: token_address.into(),
             pool: address.to_string(),
         });
 
@@ -161,10 +156,10 @@ impl<'a> Tensorswap<'a> {
     // It automatically selects the first order/pool (highest price) to sell to.
     pub async fn get_sell_now_tx(
         &self,
-        seller: String,
-        mint: String,
+        seller: &str,
+        token_address: &str,
     ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
-        let slug = self.0.collection().get_slug(mint.clone()).await?;
+        let slug = self.0.collection().get_slug(token_address.into()).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot sell compressed NFTs - use tcomp buy instead");
@@ -174,8 +169,10 @@ impl<'a> Tensorswap<'a> {
         let active_orders = self.get_active_orders(slug).await?;
         // If there are no active orders, return an error.
         let highest_price_order = active_orders.get(0).unwrap().clone(); // TODO: Handle no orders.
+        dbg!(&highest_price_order);
 
-        let min_price_lamports = highest_price_order.sell_now_price.unwrap().clone();
+        let min_price_lamports = highest_price_order.sell_now_price.unwrap();
+        dbg!(&min_price_lamports);
         let pool = highest_price_order.address.clone();
         let buyer = highest_price_order.owner_address.clone();
 
@@ -185,9 +182,9 @@ impl<'a> Tensorswap<'a> {
 
         let query = TswapSellNftTxQuery::build_query(tswap_sell_nft_tx_query::Variables {
             min_price_lamports,
-            mint,
+            mint: token_address.into(),
             pool,
-            seller,
+            seller: seller.into(),
             seller_token_account: None,
         });
 
@@ -320,10 +317,10 @@ impl<'a> Tensorswap<'a> {
 
     pub async fn get_delist_nft_tx(
         &self,
-        mint: &str,
         owner: &str,
+        token_address: &str,
     ) -> anyhow::Result<Option<(Option<Byte>, Byte)>> {
-        let slug = self.0.collection().get_slug(mint.into()).await?;
+        let slug = self.0.collection().get_slug(token_address.into()).await?;
 
         if self.0.collection().is_compressed(slug.clone()).await? {
             eprintln!("cannot delist compressed NFTs - use tcomp delist instead");
@@ -331,7 +328,7 @@ impl<'a> Tensorswap<'a> {
         }
 
         let query = TswapDelistNftTxQuery::build_query(tswap_delist_nft_tx_query::Variables {
-            mint: mint.into(),
+            mint: token_address.into(),
             owner: owner.into(),
         });
 
